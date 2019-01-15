@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Core\Data\" />
-    <Folder Include="Resources\Datatypes\" />
     <Folder Include="Resources\Extensions\" />
   </ItemGroup>
 

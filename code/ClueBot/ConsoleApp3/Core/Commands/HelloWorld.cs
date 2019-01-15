@@ -10,12 +10,6 @@ namespace ClueBot.Core.Commands
 {
     public class HelloWorld:ModuleBase<SocketCommandContext>
     {
-        [Command("Hello"), Alias("sup", "hi", "yo"), Summary("Hello World Command")]
-        public async Task ExecCommand()
-        {
-            await Context.Channel.SendMessageAsync("Yo.");
-        }
-
         [Command("About"), Summary("Shows information about the bot and its authors.")]               //This 
         public async Task About()
         {

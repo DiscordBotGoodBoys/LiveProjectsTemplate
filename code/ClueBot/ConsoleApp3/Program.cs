@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;   
-
-
-
+using Discord.WebSocket;
+using Newtonsoft.Json;
+using ClueBot.Resources.Datatypes;
+using ClueBot.Resources.Settings;
 namespace ConsoleApp3
 {
     class Program
@@ -17,12 +17,30 @@ namespace ConsoleApp3
         private CommandService Commands;
 
         static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+        => new Program().MainAsync().GetAwaiter().GetResult();
 
         
 
         private async Task MainAsync()
         {
+            string JSON = "";
+            string SettingsLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).Replace(@"bin\Debug\netcoreapp2.0", @"Data\Settings.json");
+            using (var Stream = new FileStream(SettingsLocation, FileMode.Open, FileAccess.Read))
+            using (var ReadSettings = new StreamReader(Stream))
+            {
+                JSON = ReadSettings.ReadToEnd();
+            }
+
+            Setting Settings = JsonConvert.DeserializeObject<Setting>(JSON);
+
+            ESettings.Banned = Settings.banned;
+            ESettings.Log = Settings.log;
+            ESettings.Owner = Settings.owner;
+            ESettings.Token = Settings.token;
+            ESettings.Version = Settings.version;
+
+
+
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Debug,
@@ -40,7 +58,7 @@ namespace ConsoleApp3
 
             Client.Ready += Client_Ready;
             Client.Log += Client_Log;
-            string token = "";      //DO NOT PUT TOKEN HERE. Read it from a separate text file, and never upload that file.
+            string token = "";      //DO NOT PUT TOKEN HERE. Read it from a separate text file (Data\Token.txt), and never upload that file.
             using (var Stream = new FileStream((Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Replace(@"bin\Debug\netcoreapp2.0", @"Data\Token.txt"), FileMode.Open, FileAccess.Read))
             using (var ReadToken = new StreamReader(Stream))
             {

@@ -20,7 +20,7 @@ namespace ClueBot.Core.Data
         }
     
 
-        public static async void SaveExp(ulong UserId, int Amount)
+        public static async Task SaveExp(ulong UserId, int Amount)
         {
             using (var DbContext = new SqliteDbContext())
             {

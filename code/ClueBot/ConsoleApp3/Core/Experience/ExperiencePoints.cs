@@ -6,16 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using ClueBot.Core.Data;
+using ClueBot.Resources.Database;
+using System.Linq;
 
 namespace ClueBot.Core.Experience
 {
     [Group("experience"), Alias("experiencepoints", "xp", "exp"), Summary("Group to manage experience")]
-    class ExperiencePoints : ModuleBase<ShardedCommandContext>
+    public class ExperiencePoints : ModuleBase<ShardedCommandContext>
     {
         [Command(""), Alias("me", "my"), Summary("Shows your experience")]
-        public async Task Me()
+        public async Task Me(IUser User = null)
         {
-
+            if (User == null)
+                await Context.Channel.SendMessageAsync($"{Context.User.Username} has {Data.Data.GetExp(Context.User.Id)} XP.");
+            else
+                await Context.Channel.SendMessageAsync($"{Context.User}, you have {Data.Data.GetExp(Context.User.Id)} XP.");
         }
 
         [Command("wager"), Alias("bet"), Summary("Used to bet some points towards the next game")]
@@ -28,11 +33,43 @@ namespace ClueBot.Core.Experience
                 return;
             }
 
+            //await Data.Data.SaveExp(User.Id);
+
             //SocketGuildUser User1 = Context.User as SocketGuildUser;
             //if(!User1.GuildPermissions.Administrator)                     Tests if the user has a specified permission.
 
             throw new NotImplementedException();    //Command not yet implemented.
         }
-     
+
+        [Command("ResetEXP"), Summary("Resets all XP progress of mentioned player")]
+        public async Task ResetEXP(IUser User = null)
+        {
+            if(User == null)
+            {
+                await Context.Channel.SendMessageAsync($"You need to specify a user to reset (e.g. ?ResetEXP {Context.User.Mention}");
+                return;
+            }
+
+            if(User.IsBot)
+            {
+                await Context.Channel.SendMessageAsync("Bots cannot be reset.");
+                return;
+            }
+
+            SocketGuildUser User1 = Context.User as SocketGuildUser;
+            if(!User1.GuildPermissions.Administrator)
+            {
+                await Context.Channel.SendMessageAsync($"You don't have administrator permissions in this server.");
+                return;
+            }
+            await Context.Channel.SendMessageAsync($"{User.Mention}'s experience points have been reset.");
+
+            using (var DbContext = new SqliteDbContext())
+            {
+                DbContext.ExperiencePoints.RemoveRange(DbContext.ExperiencePoints.Where(x => x.UserId == User.Id));
+                await DbContext.SaveChangesAsync();
+            }
+        }
+
     }
 }

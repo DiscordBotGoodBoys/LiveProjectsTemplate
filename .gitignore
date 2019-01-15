@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 
 code/ClueBot/ConsoleApp3/Data/Token.txt
+code/ClueBot/ConsoleApp3/Data/Settings.json
