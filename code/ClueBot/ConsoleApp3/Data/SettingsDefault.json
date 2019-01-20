@@ -1,0 +1,6 @@
+{
+  "token": "bot_token",
+  "owner": owner_ID,
+  "log": [ server_ID, log_channel_ID ],
+  "version": "0.4"
+}
