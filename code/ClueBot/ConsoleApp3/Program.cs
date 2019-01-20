@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Linq;
 
 using Discord;
 using Discord.Commands;
@@ -42,7 +43,7 @@ namespace ConsoleApp3
 
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = LogSeverity.Info,
             });
 
             Commands = new CommandService(new CommandServiceConfig
