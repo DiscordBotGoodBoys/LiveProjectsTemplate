@@ -43,7 +43,7 @@ namespace ConsoleApp3
 
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Info,
+                LogLevel = LogSeverity.Debug,
             });
 
             Commands = new CommandService(new CommandServiceConfig
