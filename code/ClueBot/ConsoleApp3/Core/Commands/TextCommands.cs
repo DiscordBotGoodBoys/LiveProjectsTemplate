@@ -29,7 +29,7 @@ namespace ClueBot.Core.Commands
             {
                 EmbedBuilder Embed = new EmbedBuilder();        // used to start an embedded message
                 Embed.WithTitle("What do you need help with?");
-                Embed.WithDescription("/n/n **?help game**: Shows game commands. ");
+                Embed.WithDescription("\n\n **?help game**: Shows game commands. ");
 
                 Embed.WithColor(55, 0, 255);
                 await Context.Channel.SendMessageAsync("", false, Embed.Build());
@@ -55,5 +55,6 @@ namespace ClueBot.Core.Commands
             }
 
         }
+
     }
 }   

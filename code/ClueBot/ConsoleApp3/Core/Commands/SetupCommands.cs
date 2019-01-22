@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using using System.Linq;
+using System.Linq;
 
 namespace ClueBot.Core.Commands
 {
-    class SetupCommands
+    public class SetupCommands : ModuleBase<ShardedCommandContext>
     {
         [Command("Host"), Summary("Host a game, and summons the bot.")]
         public async Task Host()
@@ -22,6 +22,10 @@ namespace ClueBot.Core.Commands
         {
             if (User == null)
                 await Context.Channel.SendMessageAsync("You need to specify a user to add.");
+            else
+            {
+
+            }
         }
 
         [Command("RemovePlayer"), Summary("Removes a player from the game.")]
