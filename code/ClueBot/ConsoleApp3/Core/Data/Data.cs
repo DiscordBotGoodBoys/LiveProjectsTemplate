@@ -1,9 +1,6 @@
 ﻿using ClueBot.Resources.Database;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ClueBot.Core.Data
 {

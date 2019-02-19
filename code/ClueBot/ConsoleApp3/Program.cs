@@ -1,21 +1,22 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Linq;
-
+﻿using ClueBot.Resources.Datatypes;
+using ClueBot.Resources.Settings;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using ClueBot.Resources.Datatypes;
-using ClueBot.Resources.Settings;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
+
 namespace ConsoleApp3
 {
-    class Program
+    public class Program
     {
         private DiscordSocketClient Client;
         private CommandService Commands;
+        private IServiceProvider Services;
 
         static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
@@ -54,11 +55,14 @@ namespace ConsoleApp3
             });
 
             Client.MessageReceived += Client_MessageReceived;
-            await Commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await Commands.AddModulesAsync(Assembly.GetEntryAssembly(), Services);
 
             Client.Ready += Client_Ready;
             Client.Log += Client_Log;
-            
+
+            Services = new ServiceCollection()
+                .BuildServiceProvider();
+
             await Client.LoginAsync(TokenType.Bot, ESettings.Token);
             await Client.StartAsync();
 
@@ -75,7 +79,7 @@ namespace ConsoleApp3
 
         private async Task Client_Ready()
         {
-            await Client.SetGameAsync("?help for commands!", "https://github.com/", StreamType.NotStreaming);     //Sets rich prescence window
+            await Client.SetGameAsync("?help for commands!", "https://github.com/"/*, StreamType.NotStreaming*/);     //Sets rich prescence window
         }
 
         private async Task Client_MessageReceived(SocketMessage MessageParam)
@@ -90,7 +94,7 @@ namespace ConsoleApp3
 
             if (!(Message.HasStringPrefix("?", ref ArgPos) || Message.HasMentionPrefix(Client.CurrentUser, ref ArgPos))) return;
 
-            var Result = await Commands.ExecuteAsync(Context, ArgPos);
+            var Result = await Commands.ExecuteAsync(Context, ArgPos, Services);
             if (!Result.IsSuccess)
             {
                 Console.WriteLine($"{DateTime.Now} at Commands] Something went wrong executing a command. Text: {Context.Message.Content} | Error: {Result.ErrorReason}");

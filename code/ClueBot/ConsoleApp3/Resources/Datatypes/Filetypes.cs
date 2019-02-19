@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-
-namespace ClueBot.Resources.Datatypes
+﻿namespace ClueBot.Resources.Datatypes
 {
     public class Setting
     {

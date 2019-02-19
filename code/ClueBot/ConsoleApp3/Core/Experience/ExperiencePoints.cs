@@ -1,17 +1,14 @@
-﻿using Discord.Commands;
+﻿using ClueBot.Resources.Database;
 using Discord;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using Discord.Commands;
 using Discord.WebSocket;
-using ClueBot.Core.Data;
-using ClueBot.Resources.Database;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace ClueBot.Core.Experience
+namespace ClueBot.Core.Experience   ///Unnecessary; sacrificial feature.
 {
-    [Group("experience"), Alias("experiencepoints", "xp", "exp"), Summary("Group to manage experience")]
+    [Group("experience"), Alias("xp", "exp"), Summary("Group to manage experience")]
     public class ExperiencePoints : ModuleBase<ShardedCommandContext>
     {
         [Command(""), Alias("me", "my"), Summary("Shows your experience")]

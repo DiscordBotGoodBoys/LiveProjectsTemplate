@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ClueBot.Core.Moderation
 {
@@ -40,8 +37,8 @@ namespace ClueBot.Core.Moderation
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithAuthor($"Invites for server {Guild.Name}:", Guild.IconUrl);
                 Embed.WithColor(55, 0, 255);
-                foreach (var Current in Invites)
-                    Embed.AddInlineField("Invite: ", $"[Invite]({Current.Url})");
+                //foreach (var Current in Invites)
+                  //  Embed.AddInlineField("Invite: ", $"[Invite]({Current.Url})");
 
                 await Context.Channel.SendMessageAsync("", false, Embed.Build());
             }

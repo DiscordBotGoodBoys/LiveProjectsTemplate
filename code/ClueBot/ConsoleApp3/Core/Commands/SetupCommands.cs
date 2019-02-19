@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Linq;
+using Discord.Audio;
 
 namespace ClueBot.Core.Commands
 {
@@ -14,7 +15,7 @@ namespace ClueBot.Core.Commands
         [Command("Host"), Summary("Host a game, and summons the bot.")]
         public async Task Host()
         {
-
+            throw new NotImplementedException();
         }
 
         [Command("AddPlayer"), Summary("Adds a player to the game.")]
@@ -24,26 +25,26 @@ namespace ClueBot.Core.Commands
                 await Context.Channel.SendMessageAsync("You need to specify a user to add.");
             else
             {
-
+                throw new NotImplementedException();
             }
         }
 
         [Command("RemovePlayer"), Summary("Removes a player from the game.")]
         public async Task RemovePlayer()
         {
-
+            throw new NotImplementedException();
         }
 
         [Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
         public async Task StartGame()
         {
-
+            throw new NotImplementedException();
         }
 
         [Command("Close"), Alias("CloseGame"), Summary("Closes current game.")]
         public async Task CloseGame()
         {
-
+            throw new NotImplementedException();
         }
 
     }
