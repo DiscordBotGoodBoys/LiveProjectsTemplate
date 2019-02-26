@@ -6,9 +6,8 @@ using Discord.WebSocket;
 
 namespace ClueBot.Core.Commands
 {
-    public class GameCommands:ModuleBase<SocketCommandContext>
-    {
-        
+    public class GameCommands:ModuleBase<ShardedCommandContext>
+    { 
         public int playerTurn = 0;
         [Command("MoveTowards"), Summary("Moves the player towards a place.")]
         public async Task MoveTowards()
@@ -37,11 +36,11 @@ namespace ClueBot.Core.Commands
         [Command("Roll"), Summary("Rolls the dice")]
         public async Task Roll()
         {
-            /*if (user == playerTurn)
+            if (SetupCommands.player[0].playerNumber == playerTurn)
             {
                 
             }
-            */
+            
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(55, 0, 255);
             Embed.WithDescription(":game_die: " + DiceRoll());  
@@ -56,7 +55,5 @@ namespace ClueBot.Core.Commands
             Console.WriteLine(die1 + " + " + die2);
             return die1 + die2;
         }
-    }
-
-    
+    } 
 }

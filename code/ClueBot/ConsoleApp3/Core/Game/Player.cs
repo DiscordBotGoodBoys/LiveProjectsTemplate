@@ -12,25 +12,24 @@ namespace ClueBot.Core.Commands
 {
     public class Player
     {
-        int posX;
-        int posY;
-        IUser playerUser;
+        public int x, y;
+        public string userID;
+        public int playerNumber;
+        string room;
 
-        public Player(int playerNumber)
+        string[] cards;
+
+        public Player(string userID, int playerNumber, string room)
         {
+            this.userID = userID;
             this.playerNumber = playerNumber;
+            this.room = room;
         }
 
         public string userName
         {
             get { return userName; }
             set { userName = value; }
-        }
-
-        public int playerNumber
-        {
-            get { return playerNumber; }
-            set { playerNumber = value; }
         }
     }
 }
