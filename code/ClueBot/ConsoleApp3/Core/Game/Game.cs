@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
-
-
-
-namespace ClueBot.Core.Game
+namespace ClueBot.Core.Commands
 {
-    class Game
+    public class Game
     {
-        //Game States
-        const int SETUP = 0;
-        const int START = 1;
-        const int SUGGEST1 = 2;
-        const int ROLL = 3;
-        const int MOVE = 4;
-        const int SUGGEST2 = 5;
-        const int END = 6;
+        public static bool gameHosting = false;
+        public static bool gamePlaying = false;
 
-        int playerTurn = 0;
+        public static string gameState = "Null";
 
+        public static Player[] player = new Player[5];
 
+        // = tbd
+        /// = done
+        private async Task Gameplay()
+        {
+            while (gamePlaying)
+            {
 
-        //1)    Determine the order in which players play. Assign numbers (instances of classes) to players. 
+            }
+        }
+        ///1)    Determine the order in which players play. Assign numbers (instances of classes) to players. 
         //      Set case cards. Deal cards. 
         
         //2)    Randomise weapon and player positions. 

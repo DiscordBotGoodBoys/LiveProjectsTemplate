@@ -6,10 +6,15 @@ using Discord.WebSocket;
 
 namespace ClueBot.Core.Commands
 {
-    public class GameCommands:ModuleBase<ShardedCommandContext>
-    { 
-        public int playerTurn = 0;
-        [Command("MoveTowards"), Summary("Moves the player towards a place.")]
+    public class GameCommands : ModuleBase<ShardedCommandContext>
+    {
+
+        public static int roll = 0;
+
+    
+
+        
+    [Command("MoveTowards"), Summary("Moves the player towards a place.")]
         public async Task MoveTowards()
         {
             throw new NotImplementedException();
@@ -36,14 +41,14 @@ namespace ClueBot.Core.Commands
         [Command("Roll"), Summary("Rolls the dice")]
         public async Task Roll()
         {
-            if (SetupCommands.player[0].playerNumber == playerTurn)
+            if (Game.player[0].playerNumber == Global.playerTurn)
             {
-                
+                roll = DiceRoll();
             }
             
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(55, 0, 255);
-            Embed.WithDescription(":game_die: " + DiceRoll());  
+            Embed.WithDescription(":game_die: " + roll);  
             await Context.Channel.SendMessageAsync("", false, Embed.Build());
         }
 

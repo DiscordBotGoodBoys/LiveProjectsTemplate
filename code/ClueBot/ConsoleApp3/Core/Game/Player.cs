@@ -15,6 +15,7 @@ namespace ClueBot.Core.Commands
         public int x, y;
         public string userID;
         public int playerNumber;
+
         string room;
 
         string[] cards;
@@ -26,10 +27,10 @@ namespace ClueBot.Core.Commands
             this.room = room;
         }
 
-        public string userName
-        {
-            get { return userName; }
-            set { userName = value; }
-        }
+        //public string userName
+        //{
+        //    get { return userName; }
+        //    set { userName = value; }
+        //}
     }
 }

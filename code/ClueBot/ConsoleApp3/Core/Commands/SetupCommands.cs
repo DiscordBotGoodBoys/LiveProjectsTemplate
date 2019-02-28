@@ -12,49 +12,39 @@ namespace ClueBot.Core.Commands
 {
     public class SetupCommands : ModuleBase<SocketCommandContext>
     {
-        public static bool gameHosting = false;
-        public static bool gameStarted = false;
-        public static string gameState = "Null";
-        //public static string player1 = null, player2 = null, player3 = null, 
-        //    player4 = null, player5 = null, player6 = null;
-
         
-        public static Player[] player = new Player[5]; 
 
 
 
 
         [Command("Host"), Summary("Summons the bot and hosts the game.")]
-        public async Task Host(IUser User = null)
+        public async Task Host()
         {
-            if (User == null)
+            if (!Game.gameHosting)
             {
-                await Context.Channel.SendMessageAsync("You need to specify a user to elect as host (?host @[user]).");
-                return;
-            }
-
-            if (!gameHosting)
-            {
-                //SocketGuildUser User1 = Context.User as SocketGuildUser;
-                player[0] = new Player(User.Mention, 1, "room");
-                gameHosting = true;
-                await Context.Channel.SendMessageAsync("Game opened! Use ?addplayer @[user] to add more players to your game.");
+                Game.player[0] = new Player(Context.User.Id.ToString(), 1, "room");
+                Game.gameHosting = true;
+                await Context.Channel.SendMessageAsync("Game open! Use ?addplayer @[user] to add more players to your game.");
             }
 
             else
             {
                 await Context.Channel.SendMessageAsync("Somebody is already hosting! Ask them super nicely to add you to the game.");
             }
-            
-            
 
-
-            
         }
 
         [Command("AddPlayer"), Summary("Adds a player to the game.")]
         public async Task AddPlayer(IUser User = null)
-        {
+        { 
+
+            
+
+            if (!CorrectPlayer(Context.Message.Author, 1))
+            {
+                  await Context.Channel.SendMessageAsync("Only the host can add players."); 
+            }
+
             if (User == null)
             {
                 await Context.Channel.SendMessageAsync("You need to specify a user to add (?addplayer @[user].");
@@ -64,9 +54,9 @@ namespace ClueBot.Core.Commands
             {
                 for (int i = 0; i <= 6; i++)
                 {
-                    if(player[i] != null)
+                    if(Game.player[i] != null)
                     {
-                        if (User.Mention == player[i].userID)
+                        if (User.Id.ToString() == Game.player[i].userID)
                         {
                             await Context.Channel.SendMessageAsync("This player has already been added to your game.");
                             return;
@@ -75,32 +65,30 @@ namespace ClueBot.Core.Commands
 
                     if (!PlayerExists(i))
                     {
-                        player[i] = new Player(User.Mention, i, "room");
+                        Game.player[i] = new Player(User.Id.ToString(), i, "room");
                         await Context.Channel.SendMessageAsync("Player " + (i + 1) + " added.");
                         i = 99;
                     }
                 }
-
-
-
             }
         }
 
+        //Checks through the player list to see if user IDs match, then removes user with that ID.
         [Command("RemovePlayer"), Summary("Removes a player from the game.")]
         public async Task RemovePlayer(IUser User = null)
         {
             if (User == null)
             {
-                await Context.Channel.SendMessageAsync("You need to specify a user to remove(?removeplayer @[user]).");
+                await Context.Channel.SendMessageAsync("You need to specify a user to remove (?removeplayer @[user]).");
                 return;
             }
             else
             {
                 for (int i = 0; i <= 6; i++)
                 {
-                    if (player[i] == User)
+                    if (Game.player[i].userID == User.Id.ToString())
                     {
-                        player[i] = null;
+                        Game.player[i] = null;
                     }
                 }
             }
@@ -109,29 +97,58 @@ namespace ClueBot.Core.Commands
         [Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
         public async Task StartGame()
         {
-            if (player.GetLength(6) > 1)
+            if (Game.player.GetLength(6) > 1)
             {
-                gameStarted = true;
-                gameState = "";
+                Game.gamePlaying = true;
+                Game.gameState = "";
             }
         }
 
+        
         [Command("Close"), Alias("CloseGame"), Summary("Closes current game.")]
         public async Task CloseGame()
         {
-            gameHosting = false;
+            Game.gameHosting = false;
+            Game.gamePlaying = false;
             for (int i = 0; i < 6; i++)
             {
-                player[i] = null;
+                Game.player[i] = null;
             }
         }
 
-        public bool PlayerExists(int playerNumber)    //Checks if player number has been added.
+        //Checks if player playerNumber has been added to the game.
+        public bool PlayerExists(int playerNumber)    
         {
-            if (player[playerNumber] != null)
+            if (Game.player[playerNumber] != null)
                 return true;
             return false;
             
         }
+
+        //Checks that the user is the specified player
+        public bool CorrectPlayer(IUser user, int whichPlayer)  
+        {
+            if (user.Id.CompareTo(Game.player[whichPlayer].userID) > 0)
+            {
+                return true;
+            }
+
+            Context.Channel.SendMessageAsync("Invalid command user");
+            return false;
+        }
+
+        //Mentioned users have their IDs encapsulated in symbols (eg. "<@!userid>).
+        //This function removes those symbols to truely match the user IDs.
+        public string Unmentionify(ref string mentionedUser)
+        {
+            mentionedUser = mentionedUser.Replace("<@!", "");
+            mentionedUser = mentionedUser.Replace(">", "");
+            return mentionedUser;
+        }
+
+        //string mentionedUser = User.Mention;
+        //Unmentionify(ref mentionedUser);        <------ That's how it's used :^)
+
+
     }
 }
