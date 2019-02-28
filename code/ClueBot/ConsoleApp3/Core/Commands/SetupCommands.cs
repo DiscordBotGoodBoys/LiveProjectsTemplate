@@ -13,6 +13,8 @@ namespace ClueBot.Core.Commands
     public class SetupCommands : ModuleBase<SocketCommandContext>
     {
         public static bool gameHosting = false;
+        public static bool gameStarted = false;
+        public static string gameState = "Null";
         //public static string player1 = null, player2 = null, player3 = null, 
         //    player4 = null, player5 = null, player6 = null;
 
@@ -27,7 +29,7 @@ namespace ClueBot.Core.Commands
         {
             if (User == null)
             {
-                await Context.Channel.SendMessageAsync("You need to specify a user to add.");
+                await Context.Channel.SendMessageAsync("You need to specify a user to elect as host (?host @[user]).");
                 return;
             }
 
@@ -36,7 +38,7 @@ namespace ClueBot.Core.Commands
                 //SocketGuildUser User1 = Context.User as SocketGuildUser;
                 player[0] = new Player(User.Mention, 1, "room");
                 gameHosting = true;
-                await Context.Channel.SendMessageAsync("Game opened! Use ?addplayer to add more players to your game.");
+                await Context.Channel.SendMessageAsync("Game opened! Use ?addplayer @[user] to add more players to your game.");
             }
 
             else
@@ -55,7 +57,7 @@ namespace ClueBot.Core.Commands
         {
             if (User == null)
             {
-                await Context.Channel.SendMessageAsync("You need to specify a user to add.");
+                await Context.Channel.SendMessageAsync("You need to specify a user to add (?addplayer @[user].");
                 return;
             }
             else
@@ -85,15 +87,33 @@ namespace ClueBot.Core.Commands
         }
 
         [Command("RemovePlayer"), Summary("Removes a player from the game.")]
-        public async Task RemovePlayer()
+        public async Task RemovePlayer(IUser User = null)
         {
-            throw new NotImplementedException();
+            if (User == null)
+            {
+                await Context.Channel.SendMessageAsync("You need to specify a user to remove(?removeplayer @[user]).");
+                return;
+            }
+            else
+            {
+                for (int i = 0; i <= 6; i++)
+                {
+                    if (player[i] == User)
+                    {
+                        player[i] = null;
+                    }
+                }
+            }
         }
 
         [Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
         public async Task StartGame()
         {
-            throw new NotImplementedException();
+            if (player.GetLength(6) > 1)
+            {
+                gameStarted = true;
+                gameState = "";
+            }
         }
 
         [Command("Close"), Alias("CloseGame"), Summary("Closes current game.")]
