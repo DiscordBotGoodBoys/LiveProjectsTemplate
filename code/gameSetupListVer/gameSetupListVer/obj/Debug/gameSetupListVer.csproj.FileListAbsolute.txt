@@ -1,0 +1,21 @@
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe.config
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.pdb
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csprojAssemblyReference.cache
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csproj.CoreCompileInputs.cache
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.exe
+H:\Year 2\Prof Dev\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.pdb
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe.config
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.pdb
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csprojAssemblyReference.cache
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csproj.CoreCompileInputs.cache
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.exe
+C:\Users\docto\Desktop\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.pdb
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe.config
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.pdb
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csprojAssemblyReference.cache
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csproj.CoreCompileInputs.cache
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.exe
+H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.pdb
