@@ -52,7 +52,7 @@ namespace ClueBot.Core.Commands
             await Context.Channel.SendMessageAsync("", false, Embed.Build());
         }
 
-        public int DiceRoll()
+        public static int DiceRoll()
         {
             Random random = new Random();
             int die1 = random.Next(1, 7);

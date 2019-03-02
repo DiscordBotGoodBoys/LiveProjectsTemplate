@@ -19,3 +19,10 @@ H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\ob
 H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csproj.CoreCompileInputs.cache
 H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.exe
 H:\Year 2\Prof Dev\Updated\gameSetupListVer\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.pdb
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe.config
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.exe
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\bin\Debug\gameSetupListVer.pdb
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csprojAssemblyReference.cache
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.csproj.CoreCompileInputs.cache
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.exe
+D:\Documents\GitHub\DiscordBotGoodBoys\LiveProjectsTemplate\code\gameSetupListVer\gameSetupListVer\obj\Debug\gameSetupListVer.pdb

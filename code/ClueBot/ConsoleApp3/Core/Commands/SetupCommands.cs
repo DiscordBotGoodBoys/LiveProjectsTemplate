@@ -99,7 +99,7 @@ namespace ClueBot.Core.Commands
         {
             if (Game.player.GetLength(6) > 1)
             {
-                Game.gamePlaying = true;
+                Game.gameStart = true;
                 Game.gameState = "";
             }
         }
