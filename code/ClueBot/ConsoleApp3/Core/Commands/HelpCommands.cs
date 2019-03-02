@@ -30,21 +30,19 @@ namespace ClueBot.Core.Commands
                 "\n\n?**addplayer** [@player]: Adds mentioned player to your game, provided they are in your voice channel." +
                 "\n\n?**removeplayer** [@player] Removes mentioned player from your game." +
                 "\n\n?**start**: Starts the game. Have fun! (start, startgame)" +
-                "\n\n?**close**: Closes current game and disconnects the bot. (close, closegame)");
+                "\n\n?**close**: Closes the current game. (close, closegame)");
             Embed.WithColor(55, 0, 255);
             await Context.Channel.SendMessageAsync("", false, Embed.Build());
 
             EmbedBuilder Embed2 = new EmbedBuilder();
             Embed.WithTitle("Game Commands");
 
-            Embed.WithDescription("?**MoveTowards**: Moves you towards a building." +
-                "\n\n?**Suggest** [@player] [weapon] [building]: Suggests a case (?Suggest @Haygarth Knife Kitchen). Has no game-ending consequences." +
-                "\n\n?**Accuse** [@player] [weapon] [building] Accuse a player in the same way you can suggest a player. Remember, if you're wrong, you're out!");
+            Embed.WithDescription("?**Roll**: Rolls the dice." +
+                "?**MoveTowards**: Moves you towards a building." +
+                "\n\n?**Suggest** [@person] [weapon] [building]: Suggests a case (?Suggest @Haygarth Knife Kitchen). Has no game-ending consequences." +
+                "\n\n?**Accuse** [@person] [weapon] [building]: Accuse someone of the crime. If you're correct, you win. If you're wrong, you're out!");
             Embed.WithColor(55, 0, 255);
             await Context.Channel.SendMessageAsync("", false, Embed.Build());
-
-
-
 
         }
         

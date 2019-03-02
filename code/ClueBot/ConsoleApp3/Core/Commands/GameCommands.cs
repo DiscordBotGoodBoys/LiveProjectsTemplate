@@ -2,7 +2,6 @@
 using Discord.Commands;
 using System;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 
 namespace ClueBot.Core.Commands
 {
@@ -14,7 +13,7 @@ namespace ClueBot.Core.Commands
     
 
         
-    [Command("MoveTowards"), Summary("Moves the player towards a place.")]
+        [Command("MoveTowards"), Summary("Moves the player towards a place.")]
         public async Task MoveTowards()
         {
             throw new NotImplementedException();
@@ -41,18 +40,18 @@ namespace ClueBot.Core.Commands
         [Command("Roll"), Summary("Rolls the dice")]
         public async Task Roll()
         {
-            if (Game.player[0].playerNumber == Global.playerTurn)
+            if (Game.player[0].playerNumber == Game.playerTurn)
             {
                 roll = DiceRoll();
             }
             
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(55, 0, 255);
-            Embed.WithDescription(":game_die: " + roll);  
+            Embed.WithDescription(":game_die: " + roll + ". Use ?MoveTowards [coords] to move!");  
             await Context.Channel.SendMessageAsync("", false, Embed.Build());
         }
 
-        public static int DiceRoll()
+        public int DiceRoll()
         {
             Random random = new Random();
             int die1 = random.Next(1, 7);

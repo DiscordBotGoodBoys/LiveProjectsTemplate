@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Discord.Commands;
 using System.Threading;
+using System.Threading.Tasks;
+
 
 namespace ClueBot.Core.Commands
 {
-    public class Game
+    public class Game : ModuleBase<SocketCommandContext>
     {
         public static bool gameHosting = false;
         public static bool gameStart = false;
@@ -18,27 +17,42 @@ namespace ClueBot.Core.Commands
 
         public static Player[] player = new Player[5];
 
-        
-        private async Task Gameplay()
+        [Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
+        public async Task StartGame()
         {
+            gameStart = true;
+            gameState = "";
+            playerTurn = 1;
+            await Context.Channel.SendMessageAsync("Game starting!");
+
             if (gameStart)
             {
+                await Context.Channel.SendMessageAsync("Shuffling cards...");
+                await Context.Channel.SendMessageAsync("Setting case cards...");
                 //Set case cards, deal cards.
+                await Context.Channel.SendMessageAsync("Randomising player and weapon positions...");
                 //Randomise weappon and player positions.
+
+                await Context.Channel.SendMessageAsync("The game has begun!");
+
                 gamePlaying = true;
                 gameStart = false;
                 playerTurn = 1;
-                gameState = "RollOrSuggest";
+                gameState = "Roll";
             }
 
             while (gamePlaying)
             {
 
-                if (gameState == "RollOrSuggest")
-                {
-                    SpinWait.SpinUntil(() => GameCommands.roll > 0);
+                //if (gameState == "Roll")  //Put roll logic in here if necessary.
+                //{
 
-                }
+                //}
+                await Context.Channel.SendMessageAsync("Player " + playerTurn + "'s turn. ?Roll the dice!");
+                SpinWait.SpinUntil(() => GameCommands.roll > 0);
+                gameState = "Moving";
+
+                
                 GameCommands.roll = 0;
             }
                 
@@ -55,9 +69,7 @@ namespace ClueBot.Core.Commands
 
         //3)    Game loop begins!
 
-        //4)    Players start their turn either by rolling or suggesting a person.
-
-        //4a)   Player suggests a case providing that they are in a room. This ends the player turn.
+        //4)    Players start their turn by rolling.
 
         //4b)   Player rolls. Player uses MoveTowards to move towards a building.
 
