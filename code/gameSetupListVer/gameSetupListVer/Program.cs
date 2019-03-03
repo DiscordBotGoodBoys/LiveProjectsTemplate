@@ -75,7 +75,6 @@ namespace gameSetupListVer
             Console.WriteLine(Environment.NewLine);
 
             //Shuffle Cards
-
             Scenario.cardsList.Shuffle();
 
             // Display shuffled cards
@@ -86,7 +85,7 @@ namespace gameSetupListVer
 
 
             //Deal Cards 
-           int cards = Scenario.cardsList.Count;
+            int cards = Scenario.cardsList.Count;
 
             Console.WriteLine("Available cards: " + cards);
 

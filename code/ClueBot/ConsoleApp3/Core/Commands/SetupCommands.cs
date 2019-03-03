@@ -33,12 +33,13 @@ namespace ClueBot.Core.Commands
         [Command("AddPlayer"), Alias("Add"), Summary("Adds a player to the game.")]
         public async Task AddPlayer(IUser User = null)  //command arguments are put in the parenthesis
         { 
-            /*if (!CorrectPlayer(Context.Message.Author, 0))  //if user is not host
-            {
-                await Context.Channel.SendMessageAsync("Only the host can add players.");
-                return;
-            }
-            */
+            //          -broken code-
+            //if (!CorrectPlayer(Context.Message.Author, 0))  //if user is not host
+            //{
+            //    await Context.Channel.SendMessageAsync("Only the host can add players.");
+            //    return;
+            //}
+            
 
             if (User == null)   //if nobody is mentioned
             {
@@ -59,19 +60,19 @@ namespace ClueBot.Core.Commands
                         }
                     }
 
-                    /*if (PlayerExists(5)) //if slot 5 is full then the max number of players has been reached.
-                    {
-                        await Context.Channel.SendMessageAsync("The maximum number of players has been reached; sorry!");
-                        return;
-                    }*/
+                    //          -broken code-
+                    //else if (PlayerExists(5)) //if slot 5 is full then the max number of players has been reached.
+                    //{
+                    //    await Context.Channel.SendMessageAsync("The maximum number of players has been reached; sorry!");
+                    //    return;
+                    //}
 
-                    if (!PlayerExists(i))   //fills the lowest available slot with mentioned player.
+                    else if (!PlayerExists(i))   //fills the lowest available slot with mentioned player.
                     {
                         Game.player[i] = new Player(User.Id.ToString(), i, "room");
                         await Context.Channel.SendMessageAsync("Player " + (i + 1) + " added.");
                         i = 99;
                     }   //endif  
-
                 }   //endfor
             }   //endelse
         }   //endcommand
@@ -97,18 +98,6 @@ namespace ClueBot.Core.Commands
                 }
             }
         }
-
-        /*[Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
-        public async Task StartGame()
-        {
-            //if (PlayerExists(1))
-            //{
-                Game.gameStart = true;
-                Game.gameState = "";
-            //}
-            await Context.Channel.SendMessageAsync("Game starting!");
-        }*/
-
         
         [Command("Close"), Alias("CloseGame"), Summary("Closes current game.")]
         public async Task CloseGame()
@@ -129,13 +118,12 @@ namespace ClueBot.Core.Commands
             if (Game.player[whichPlayer] != null)
                 return true;
             return false;
-            
         }
 
         //Checks that the user is the specified player
         public bool CorrectPlayer(IUser user, int whichPlayer)  
         {
-            if (user.Id.CompareTo(Game.player[whichPlayer].userID) > 0)
+            if (user.Id.CompareTo(Game.player[whichPlayer].userID) == 0)
             {
                 return true;
             }
@@ -146,13 +134,13 @@ namespace ClueBot.Core.Commands
 
         //Mentioned users have their IDs encapsulated in symbols (eg. "<@!userid>).
         //This function removes those symbols to truely match the user IDs.
+        //This function might be obsolete, it only happens on User.Mention.
         public string Unmentionify(ref string mentionedUser)
         {
             mentionedUser = mentionedUser.Replace("<@!", "");
             mentionedUser = mentionedUser.Replace(">", "");
             return mentionedUser;
         }
-
         //string mentionedUser = User.Mention;
         //Unmentionify(ref mentionedUser);        <------ That's how it's used :^)
 

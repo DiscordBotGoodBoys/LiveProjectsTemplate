@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ClueBot.Core.Commands
 {
-    public class GameCommands : ModuleBase<ShardedCommandContext>
+    public class GameCommands : ModuleBase<SocketCommandContext> //<ShardedCommandContext>
     {
 
         public static int roll = 0;
@@ -40,10 +40,15 @@ namespace ClueBot.Core.Commands
         [Command("Roll"), Summary("Rolls the dice")]
         public async Task Roll()
         {
-            if (Game.player[0].playerNumber == Game.playerTurn)
+            if(Context.User.Id.CompareTo(Game.player[Game.playerTurn]) == 0)
             {
                 roll = DiceRoll();
             }
+
+            //if (Game.player[1].playerNumber == Game.playerTurn)
+            //{
+            //    roll = DiceRoll();
+            //}
             
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(55, 0, 255);
@@ -56,7 +61,7 @@ namespace ClueBot.Core.Commands
             Random random = new Random();
             int die1 = random.Next(1, 7);
             int die2 = random.Next(1, 7);
-            Console.WriteLine(die1 + " + " + die2);
+            //Console.WriteLine(die1 + " + " + die2);
             return die1 + die2;
         }
     } 
