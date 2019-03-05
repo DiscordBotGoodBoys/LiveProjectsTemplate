@@ -10,20 +10,17 @@ namespace ClueBot.Core.Commands
 
         public static int roll = 0;
 
-    
-
-        
         [Command("MoveTowards"), Summary("Moves the player towards a place.")]
         public async Task MoveTowards()
         {
             throw new NotImplementedException();
         }
 
-        [Command("EndTurn"), Summary("Ends the current turn.")]
-        public async Task EndTurn()
-        {
-            throw new NotImplementedException();
-        }
+        //[Command("EndTurn"), Summary("Ends the current turn.")]
+        //public async Task EndTurn()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         [Command("Suggest"), Summary("Suggests [person] with [weapon] in [location].")]
         public async Task Suspect()
@@ -40,20 +37,14 @@ namespace ClueBot.Core.Commands
         [Command("Roll"), Summary("Rolls the dice")]
         public async Task Roll()
         {
-            if(Context.User.Id.CompareTo(Game.player[Game.playerTurn]) == 0)
+            if(Game.gameState == "Roll" && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID)
             {
                 roll = DiceRoll();
-            }
-
-            //if (Game.player[1].playerNumber == Game.playerTurn)
-            //{
-            //    roll = DiceRoll();
-            //}
-            
-            EmbedBuilder Embed = new EmbedBuilder();
-            Embed.WithColor(55, 0, 255);
-            Embed.WithDescription(":game_die: " + roll + ". Use ?MoveTowards [coords] to move!");  
-            await Context.Channel.SendMessageAsync("", false, Embed.Build());
+                EmbedBuilder Embed = new EmbedBuilder();
+                Embed.WithColor(55, 0, 255);
+                Embed.WithDescription(":game_die: " + roll + ". Use ?MoveTowards [coords] to move!");
+                await Context.Channel.SendMessageAsync("", false, Embed.Build());
+            }           
         }
 
         public int DiceRoll()

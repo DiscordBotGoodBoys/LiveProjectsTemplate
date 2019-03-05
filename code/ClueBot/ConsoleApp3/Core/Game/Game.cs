@@ -90,12 +90,13 @@ namespace ClueBot.Core.Commands
 
                 gamePlaying = true;
                 gameStart = false;
-                playerTurn = 1;
+                playerTurn = 0;
                 gameState = "Roll";
             }
 
             while (gamePlaying)
             {
+                Console.WriteLine("Roll Phase");
 
                 //if (gameState == "Roll")  //Put roll logic in here if necessary.
                 //{
@@ -104,6 +105,7 @@ namespace ClueBot.Core.Commands
                 await Context.Channel.SendMessageAsync("Player " + playerTurn + "'s turn. ?Roll the dice!");
                 SpinWait.SpinUntil(() => GameCommands.roll > 0);
                 gameState = "Moving";
+                Console.WriteLine("Move Phase");
 
                 Turn(player[playerTurn], grid);
 

@@ -36,28 +36,36 @@ namespace ClueBot.Core.Commands
 
         public bool movePlayer(Grid grid, int x, int y, int diceroll)
         {
-            int movement = (Math.Abs(this.x - x) + Math.Abs(this.y - y));
-            if (movement > diceroll)
+            //diceroll = GameCommands.roll;
+            if (GameCommands.roll != 0)
             {
-                //Context.Channel.SendMessageAsync("Movement out of bounds, please try again");
-                return false;
+                int movement = (Math.Abs(this.x - x) + Math.Abs(this.y - y));
+                if (movement > diceroll)
+                {
+                    //Context.Channel.SendMessageAsync("Movement out of bounds, please try again");
+                    return false;
+                }
+                else
+                {
+                    grid.gridID[this.x, this.y] = 0;
+                    grid.gridID[x, y] = playerNumber;
+                    return true;
+                }
             }
+
             else
-            {
-                grid.gridID[this.x, this.y] = 0;
-                grid.gridID[x, y] = playerNumber;
-                return true;
-            }
+                return false;
+            
         }
 
         public int CompareTo(Player other)
         {
-            return (userID.CompareTo(other.userID));
+            return userID.CompareTo(other.userID);
         }
 
         public int CompareTo(string other)
         {
-            return (userID.CompareTo(other));
+            return userID.CompareTo(other);
         }
     }
 }

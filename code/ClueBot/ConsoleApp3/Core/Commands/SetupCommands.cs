@@ -27,13 +27,13 @@ namespace ClueBot.Core.Commands
             {
                 await Context.Channel.SendMessageAsync("Somebody is already hosting! Ask them super nicely to add you to the game.");
             }
-
         }
 
         [Command("AddPlayer"), Alias("Add"), Summary("Adds a player to the game.")]
         public async Task AddPlayer(IUser User = null)  //command arguments are put in the parenthesis
-        { 
-                   
+        {
+            
+            
             if (!CorrectPlayer(Context.Message.Author, 0))  //if user is not host
             {
                 await Context.Channel.SendMessageAsync("Only the host can add players.");
@@ -48,8 +48,10 @@ namespace ClueBot.Core.Commands
 
             else
             {
-                for (int i = 0; i <= 6; i++)
+                for (int i = 0; i <= 5; i++)
                 {
+                    
+
                     if (Game.player[i] != null)
                     {
                         if (User.Id.ToString() == Game.player[i].userID)
@@ -60,22 +62,21 @@ namespace ClueBot.Core.Commands
                         }
                     }
 
+                    //if (Game.player[5] != null) //if slot 5 is full then the max number of players has been reached.
+                    //{
+                    //    await Context.Channel.SendMessageAsync("The maximum number of players has been reached; sorry!");
+                    //    //return;
+                    //}
 
                     
-
                     if (!PlayerExists(i))   //fills the lowest available slot with mentioned player.
                     {
                         Game.player[i] = new Player(User.Id.ToString(), i, "room");
                         await Context.Channel.SendMessageAsync("Player " + (i + 1) + " added.");
-                        i = 99;
+                        return;
+
                     }   //endif  
-
-                    if (Game.player[5] != null) //if slot 5 is full then the max number of players has been reached.
-                    {
-                        await Context.Channel.SendMessageAsync("The maximum number of players has been reached; sorry!");
-                        //return;
-                    }
-
+                    Console.WriteLine(Game.player[i].playerNumber);
                 }   //endfor
             }   //endelse
         }   //endcommand
@@ -130,8 +131,6 @@ namespace ClueBot.Core.Commands
             {
                 return true;
             }
-
-            Context.Channel.SendMessageAsync("Invalid command user");
             return false;
         }
 
