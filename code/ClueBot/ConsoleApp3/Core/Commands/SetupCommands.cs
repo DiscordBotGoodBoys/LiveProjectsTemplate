@@ -33,12 +33,12 @@ namespace ClueBot.Core.Commands
         [Command("AddPlayer"), Alias("Add"), Summary("Adds a player to the game.")]
         public async Task AddPlayer(IUser User = null)  //command arguments are put in the parenthesis
         { 
-            //          -broken code-
-            //if (!CorrectPlayer(Context.Message.Author, 0))  //if user is not host
-            //{
-            //    await Context.Channel.SendMessageAsync("Only the host can add players.");
-            //    return;
-            //}
+                   
+            if (!CorrectPlayer(Context.Message.Author, 0))  //if user is not host
+            {
+                await Context.Channel.SendMessageAsync("Only the host can add players.");
+                return;
+            }
             
 
             if (User == null)   //if nobody is mentioned
@@ -60,19 +60,22 @@ namespace ClueBot.Core.Commands
                         }
                     }
 
-                    //          -broken code-
-                    //else if (PlayerExists(5)) //if slot 5 is full then the max number of players has been reached.
-                    //{
-                    //    await Context.Channel.SendMessageAsync("The maximum number of players has been reached; sorry!");
-                    //    return;
-                    //}
 
-                    else if (!PlayerExists(i))   //fills the lowest available slot with mentioned player.
+                    
+
+                    if (!PlayerExists(i))   //fills the lowest available slot with mentioned player.
                     {
                         Game.player[i] = new Player(User.Id.ToString(), i, "room");
                         await Context.Channel.SendMessageAsync("Player " + (i + 1) + " added.");
                         i = 99;
                     }   //endif  
+
+                    if (Game.player[5] != null) //if slot 5 is full then the max number of players has been reached.
+                    {
+                        await Context.Channel.SendMessageAsync("The maximum number of players has been reached; sorry!");
+                        //return;
+                    }
+
                 }   //endfor
             }   //endelse
         }   //endcommand
@@ -91,7 +94,7 @@ namespace ClueBot.Core.Commands
             {
                 for (int i = 0; i <= 6; i++)
                 {
-                    if (Game.player[i].userID == User.Id.ToString())
+                    if (Game.player[i].userID == User.Id.ToString())    
                     {
                         Game.player[i] = null;
                     }
@@ -121,9 +124,9 @@ namespace ClueBot.Core.Commands
         }
 
         //Checks that the user is the specified player
-        public bool CorrectPlayer(IUser user, int whichPlayer)  
+        public bool CorrectPlayer(SocketUser user, int whichPlayer)  
         {
-            if (user.Id.CompareTo(Game.player[whichPlayer].userID) == 0)
+            if (user.Id.ToString() == Game.player[whichPlayer].userID)
             {
                 return true;
             }
