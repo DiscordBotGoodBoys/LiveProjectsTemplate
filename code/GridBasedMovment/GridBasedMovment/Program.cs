@@ -13,14 +13,15 @@ namespace GridBasedMovment
             Grid myGrid = new Grid(24, 25);
             int currentPlayer = 0;
             bool gameRunning = true;
-            Player playerOne = new Player(1, "Haygarth", 4, 8, "no");
-            Player playerTwo = new Player(2, "Sam", 6, 9, "no");
-            Player playerThree = new Player(3, "Josh", 2, 2, "no");
+            Player playerOne = new Player(1, "Haygarth", 4, 8, "");
+            Player playerTwo = new Player(2, "Sam", 6, 9, "");
+            Player playerThree = new Player(3, "Josh", 2, 2, "");
             Player[] players = new Player[6];
             players[0] = playerOne;
             players[1] = playerTwo;
             players[2] = playerThree;
             myGrid.initializeGrid(players);
+            myGrid.roomID[5, 4] = 1;
             myGrid.drawGrid();
             while (gameRunning)
             {

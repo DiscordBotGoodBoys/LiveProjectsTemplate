@@ -13,7 +13,7 @@ namespace GridBasedMovment
         public int x, y;
         string room;
         string[] cards;
-        Random rnd = new Random();
+        Random rnd;
         public Player(int id, string name, int x, int y, string room)
         {
             this.id = id;
@@ -22,9 +22,10 @@ namespace GridBasedMovment
             this.y = y;
             this.room = room;
         }
-        public int rollDice()
+        public void rollDice(ref int i, ref int j)
         {
-            return (rnd.Next(1, 7));
+            rnd = new Random();
+            i = rnd.Next(1, 7); j = rnd.Next(1, 7);
         }
         public bool movePlayer(Grid grid, int x, int y, int diceroll)
         {

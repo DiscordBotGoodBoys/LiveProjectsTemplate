@@ -18,18 +18,25 @@ namespace GridBasedMovment
             this.x = x;
             this.y = y;
             gridID = new int[x, y];
+            roomID = new int[x, y];
         }
         public void initializeGrid()
         {
             for (int j = 0; j < y; j++)
                 for (int i = 0; i < x; i++)
+                {
                     gridID[i, j] = 0;
+                    roomID[i, j] = 0;
+                }
         }
         public void initializeGrid(Player[] players)
         {
             for (int j = 0; j < y; j++)
                 for (int i = 0; i < x; i++)
+                {
                     gridID[i, j] = 0;
+                    roomID[i, j] = 0;
+                }
             foreach(Player item in players)
             {
                 if(item != null)
@@ -50,10 +57,7 @@ namespace GridBasedMovment
             Console.Write('\n');
             for (int j = 0; j < y; j++)
             {
-                if (j < 10)
-                    Console.Write(j + " |");
-                else
-                    Console.Write(j + "|");
+                Console.Write((char)(j + 97) + " |");
                 for (int i = 0; i < x; i++)
                 {
                     Console.Write(gridID[i, j] + " |");
