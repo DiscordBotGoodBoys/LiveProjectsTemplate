@@ -36,6 +36,7 @@ namespace ClueBot.Core.Commands
                     gridID[item.x, item.y] = item.playerNumber;
             }
         }
+
         public void drawGrid()
         {
             Console.Write(" X|");
