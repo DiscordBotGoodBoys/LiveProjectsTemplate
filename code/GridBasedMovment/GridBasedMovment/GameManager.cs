@@ -97,11 +97,12 @@ namespace GridBasedMovment
             {
                 Console.WriteLine(nearestPlayerWithCards.name + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
                 string cardToShow = ChooseCardToShow(nearestPlayerWithCards, player, murderScenario.personList[personChoice - 1], murderScenario.roomList[roomID - 1], murderScenario.weaponList[weaponChoice - 1]);
-                Console.WriteLine(nearestPlayerWithCards.name + " shows you " + cardToShow + ". Press any key to continue.");
+                Console.WriteLine(nearestPlayerWithCards.name + " shows you " + cardToShow + ". Press any key to continue."); //this needs to be sent in a DM to the player
                 Console.ReadKey();
             }
         }
         private static bool Accuse(Player player, MurderScenario murderScenario)
+            //currently there's no way to escape an accusation after initiating one
         {
             bool accusationReady = false;
             int weaponChoice = 0;
@@ -154,6 +155,8 @@ namespace GridBasedMovment
         }
         private static string ChooseCardToShow(Player player, Player suggestingPlayer, string personChoice, string roomChoice, string weaponChoice)
         {
+            //in the real life board game, this function represents a player who has a suggested card
+            //deciding which card to show the suggesting player
             string buffer = "";
             List<string> cards = new List<string>();
             int noOfCards = 0;
@@ -166,7 +169,7 @@ namespace GridBasedMovment
                     noOfCards++;
                 }
             }
-            if (cards.Count == 1)
+            if (cards.Count == 1) //if you only have one of the suggested cards, there is no choice to make
             {
                 Console.WriteLine("The only card suggested in your hand was " + buffer + "so you need not choose a card. Press any key to send " + suggestingPlayer.name + " this card.");
                 Console.ReadKey();
@@ -182,30 +185,32 @@ namespace GridBasedMovment
             }
         }
         private static Player CheckPlayersForCards(int currentPlayer, Player[] players, string personChoice, string roomChoice, string weaponChoice)
+            //this function is akin to asking clockwise around the table if anyone has the cards you suggested
+            //the first person clockwise to you who has a card you suggested in their hand is returned in this function
         {
-            int playerID = currentPlayer + 1;
+            int playerID = currentPlayer + 1; //currentPlayer is the person performing the check
             if (playerID > 6)
-                playerID = 1;
+                playerID = 1; 
             while (playerID != currentPlayer)
             {
-                if (playerID > 6)
-                    playerID = 1;
+                if (playerID > 6) 
+                    playerID = 1;//a players ID is always equal to it's index in the main player array plus one. or at least, it should be...
                 if (players[playerID - 1] != null)
                 {
                     if (players[playerID - 1].cards.Contains(personChoice)
                         || players[playerID - 1].cards.Contains(roomChoice)
                         || players[playerID - 1].cards.Contains(weaponChoice))
                     {
-                        return players[playerID - 1];
+                        return players[playerID - 1]; //we don't tell the checkee what cards the checked player has in here, just that they have at least one
                     }
                 }
                 playerID++;
-                if (playerID > 6)
+                if (playerID > 6) //I wrote this check down three times because I'm very paranoid
                     playerID = 1;
             }
             return null;
         }
-        public static int GameStatus(Player[] players)
+        public static int GameStatus(Player[] players) //runs at the start of every turn to check whether the game is over
         {
             int activePlayersCount = 0;
             for (int i = 0; i < players.Length; i++)
@@ -215,21 +220,23 @@ namespace GridBasedMovment
                     switch (players[i].gameStatus)
                     {
                         case 1:
-                            return 1;
+                            return 1; //if a players state is 1 they have won
                             break;
                         case 0:
-                            activePlayersCount++;
+                            activePlayersCount++; //if a players state is 0 they are still playing
                             break;
                         default:
                             break;
                     }
                 }
             }
-            if (activePlayersCount <= 1)
+            if (activePlayersCount <= 1) //if there's only one player who is still playing, the game is over
                 return -1;
             return 0;
         }
         private static bool InterpretCoords(string coords, ref int x, ref int y)
+            //this is for ease of use for the end user. they enter coords as letter-number like in battleships
+            //validates whether a coordinate is in the correct format, but not if it's possible (i.e. if you're trying to walk into a wall)
         {
             x = 0;
             y = 0;

@@ -8,11 +8,11 @@ namespace GridBasedMovment
 {
     public class Grid
     {
-        int x, y;
-        public int[,] gridID;
-        public string[] emoji;
-        public bool[,] blocked;
-        public int[,] roomID;
+        int x, y; // the dimensions of the grid
+        public int[,] gridID; //the player ID stored in each square, 0 by default
+        public string[] emoji; //will hopefully store emoji to be drawn once integrated with the discord bot
+        public bool[,] blocked; //stores whether or not a space is a wall. false means no wall, and is the default setting
+        public int[,] roomID; //stores the location of a door, that connects to the room ID stored. 0 by default
         public Grid(int x, int y)
         {
             this.x = x;
@@ -21,7 +21,8 @@ namespace GridBasedMovment
             roomID = new int[x, y];
             blocked = new bool[x, y];
         }
-        public void initializeGrid()
+
+        public void initializeGrid() // set all grid locations to their default values
         {
             for (int j = 0; j < y; j++)
                 for (int i = 0; i < x; i++)
@@ -31,7 +32,8 @@ namespace GridBasedMovment
                     blocked[i, j] = false;
                 }
         }
-        public void initializeGrid(Player[] players)
+        public void initializeGrid(Player[] players) // set all grid locations to their default values
+                                                    // ...then put players in their spawn locations
         {
             for (int j = 0; j < y; j++)
                 for (int i = 0; i < x; i++)
@@ -46,7 +48,7 @@ namespace GridBasedMovment
                     gridID[item.x, item.y] = item.id;
             }
         }
-        public void drawGrid()
+        public void drawGrid() //draws the contents of the grid, as well as the borders around it with coordinates
         {
             Console.Write(" X|");
             for (int i = 0; i < x; i++)
@@ -65,14 +67,14 @@ namespace GridBasedMovment
                 {
                     if (blocked[i, j])
                     {
-                        Console.Write("██|");
+                        Console.Write("██|"); //where walls are drawn
                     }
                     else if (roomID[i, j] > 0)
                     {
-                        Console.Write(" \\|");
+                        Console.Write(" \\|"); //where doors are drawn
                     }
                     else
-                        Console.Write(gridID[i, j] + " |");
+                        Console.Write(gridID[i, j] + " |"); //where playerIDs are drawn
                 }
                 Console.Write('\n' + "--|");
                 for (int i = 0; i < x; i++)
