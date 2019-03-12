@@ -10,30 +10,73 @@ namespace GridBasedMovment
     {
         static void Main(string[] args)
         {
-            Grid myGrid = new Grid(24, 25);
+            Grid myGrid = new Grid(25, 24);
             int currentPlayer = 0;
             bool gameRunning = true;
-            Player playerOne = new Player(1, "Haygarth", 4, 8, "");
-            Player playerTwo = new Player(2, "Sam", 6, 9, "");
-            Player playerThree = new Player(3, "Josh", 2, 2, "");
+            Player playerOne = new Player(1, "Tom", 7, 0);
+            Player playerTwo = new Player(2, "Max", 24, 9);
+            Player playerThree = new Player(3, "Brian", 24, 14);
             Player[] players = new Player[6];
             players[0] = playerOne;
             players[1] = playerTwo;
             players[2] = playerThree;
             myGrid.initializeGrid(players);
-            myGrid.roomID[5, 4] = 1;
+            myGrid.AssignStandardWalls();
+            MurderScenario murderScenario = new MurderScenario(players);
+            foreach (string card in murderScenario.murderList)
+                Console.Write(card + ", ");
+            Console.WriteLine();
+            foreach (Player player in players)
+            {
+                if (player != null)
+                {
+                    Console.Write(player.name + "'s cards: ");
+                    foreach (string card in player.cards)
+                        Console.Write(card + ", ");
+                    Console.Write('\n');
+                }
+            }
+            myGrid.roomID[0, 0] = 1;
             myGrid.drawGrid();
             while (gameRunning)
             {
-                if (players[currentPlayer] != null)
+                string winner = "";
+                switch (GameManager.GameStatus(players))
                 {
-                    if (GameManager.Turn(players[currentPlayer], myGrid))
+                    case 1:
+                        for (int i = 0; i < players.Length; i++)
+                            if (players[i] != null)
+                                if (players[i].gameStatus == 1)
+                                    winner = players[i].name;
+                        Console.WriteLine("GAME WON BY " + winner + " VIA ACCUSATION");
                         gameRunning = false;
-                    myGrid.drawGrid();
+                        break;
+                    case -1:
+                        for (int i = 0; i < players.Length; i++)
+                            if (players[i] != null)
+                                if (players[i].gameStatus != -1)
+                                    winner = players[i].name;
+                        Console.WriteLine("GAME WON BY " + winner + " BY LAST MAN STANDING");
+                        gameRunning = false;
+                        break;
+                    default:
+                        if (players[currentPlayer] != null && players[currentPlayer].gameStatus != -1)
+                        {
+                            if (GameManager.Turn(players[currentPlayer], players, myGrid, murderScenario))
+                            {
+                                gameRunning = false;
+
+                            }
+                            else
+                            {
+                                myGrid.drawGrid();
+                            }
+                        }
+                        currentPlayer++;
+                        if (currentPlayer >= 6)
+                            currentPlayer = 0;
+                        break;
                 }
-                currentPlayer++;
-                if (currentPlayer >= 6)
-                    currentPlayer = 0;
             }
             Console.ReadKey();
         }

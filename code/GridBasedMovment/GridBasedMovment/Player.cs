@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 
 namespace GridBasedMovment
 {
-    public class Player : IComparable <Player>
+    public class Player : IComparable<Player>
     {
         public int id;
         public string name;
         public int x, y;
-        string room;
-        string[] cards;
+        public List<String> cards;
+        public int gameStatus = 0;
         Random rnd;
-        public Player(int id, string name, int x, int y, string room)
+        public Player(int id, string name, int x, int y)
         {
             this.id = id;
             this.name = name;
             this.x = x;
             this.y = y;
-            this.room = room;
+            cards = new List<string>();
+            gameStatus = 0;
         }
         public void rollDice(ref int i, ref int j)
         {
@@ -35,12 +36,35 @@ namespace GridBasedMovment
                 Console.WriteLine("\nMovement out of bounds, please try again");
                 return false;
             }
-            else
+            if (grid.gridID[x, y] > 0 && grid.gridID[x, y] != id)
             {
-                grid.gridID[this.x, this.y] = 0;
-                grid.gridID[x, y] = id;
-                return true;
+                Console.WriteLine("\nCan't move on top of another player, please try again");
+                return false;
             }
+            if (grid.blocked[x, y] == true)
+            {
+                Console.WriteLine("\nThis space is blocked, please try again");
+                return false;
+            }
+            for (int j = -1; j < 2; j++)
+            {
+                for (int i = -1; i < 2; i++)
+                {
+                    if (grid.roomID[x + i, y + j] > 0 //if the space you're trying to move to is next to a door 
+                        && (x + i != x || y + j != y)) //if the space you're trying to move to is not the door itself
+                    {
+                        Console.WriteLine("\nYou cannot occupy the space in front of a door. Please try again");
+                        return false;
+                    }
+                }
+            }
+
+            grid.gridID[this.x, this.y] = 0;
+            grid.gridID[x, y] = id;
+            this.x = x;
+            this.y = y;
+            return true;
+
         }
         public int CompareTo(Player other)
         {
