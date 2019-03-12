@@ -8,7 +8,7 @@ namespace ClueBot.Core.Commands
     public class GameCommands : ModuleBase<SocketCommandContext> //<ShardedCommandContext>
     {
 
-        public static int roll = 0;
+        
 
         [Command("MoveTowards"), Summary("Moves the player towards a place.")]
         public async Task MoveTowards()
@@ -39,7 +39,7 @@ namespace ClueBot.Core.Commands
         {
             if(Game.gameState == "Roll" && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID)
             {
-                roll = DiceRoll();
+                Game.roll = DiceRoll();
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(55, 0, 255);
                 Embed.WithDescription(":game_die: " + roll + ". Use ?MoveTowards [coords] to move!");

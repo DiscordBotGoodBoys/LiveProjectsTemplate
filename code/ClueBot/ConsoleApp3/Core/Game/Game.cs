@@ -14,6 +14,8 @@ namespace ClueBot.Core.Commands
 
         public static int playerTurn = 0;
         public static int currentPlayers = 0;
+        public static int roll = 0;
+
         public static string gameState = "Null";
 
         public static Player[] player = new Player[5];
@@ -46,8 +48,7 @@ namespace ClueBot.Core.Commands
                     currentPlayers++;
                 }
 
-                await Context.Channel.SendMessageAsync("Shuffling cards...");
-                await Context.Channel.SendMessageAsync("Setting case cards...");
+                await Context.Channel.SendMessageAsync("Dealing cards...");
 
                 //Murder Population
                 Scenario.murderList.Add(Scenario.weaponList[Scenario.rngWeapon]);
@@ -102,15 +103,15 @@ namespace ClueBot.Core.Commands
                 //{
 
                 //}
-                await Context.Channel.SendMessageAsync("Player " + playerTurn + "'s turn. ?Roll the dice!");
-                SpinWait.SpinUntil(() => GameCommands.roll > 0);
+                await Context.Channel.SendMessageAsync("Player " + (playerTurn+1) + "'s turn. ?Roll the dice!");
+                SpinWait.SpinUntil(() => roll > 0);
                 gameState = "Moving";
                 Console.WriteLine("Move Phase");
 
                 Turn(player[playerTurn], grid);
 
 
-                GameCommands.roll = 0;
+                roll = 0;
                 playerTurn++;
                 if (playerTurn > currentPlayers)
                     playerTurn = 1;
