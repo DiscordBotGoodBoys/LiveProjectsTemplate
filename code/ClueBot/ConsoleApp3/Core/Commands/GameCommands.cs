@@ -11,9 +11,12 @@ namespace ClueBot.Core.Commands
         
 
         [Command("MoveTowards"), Summary("Moves the player towards a place.")]
-        public async Task MoveTowards()
+        public async Task Move(string coords)
         {
-            throw new NotImplementedException();
+            if(Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //Checks if the correct user is using the command
+            {
+
+            }
         }
 
         //[Command("EndTurn"), Summary("Ends the current turn.")]
@@ -37,12 +40,12 @@ namespace ClueBot.Core.Commands
         [Command("Roll"), Summary("Rolls the dice")]
         public async Task Roll()
         {
-            if(Game.gameState == "Roll" && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID)
+            if(Game.gameState == "Roll" && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //checks if it is the correct user
             {
                 Game.roll = DiceRoll();
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(55, 0, 255);
-                Embed.WithDescription(":game_die: " + roll + ". Use ?MoveTowards [coords] to move!");
+                Embed.WithDescription(":game_die: " + Game.roll + ". Use ?MoveTowards [coords] to move!");
                 await Context.Channel.SendMessageAsync("", false, Embed.Build());
             }           
         }
@@ -52,7 +55,6 @@ namespace ClueBot.Core.Commands
             Random random = new Random();
             int die1 = random.Next(1, 7);
             int die2 = random.Next(1, 7);
-            //Console.WriteLine(die1 + " + " + die2);
             return die1 + die2;
         }
     } 

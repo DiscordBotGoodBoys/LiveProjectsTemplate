@@ -1,71 +1,88 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
+using Discord;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Discord.WebSocket;
-using System.Linq;
-using Discord.Audio;
 
 namespace ClueBot.Core.Commands
 {
-    public class Player
+    public class Player : IComparable<Player> //the player class holds any and all information required from a player
     {
         public int x, y;
         public string userID;
         public int playerNumber;
 
-        string room;
+        public List<string> cards;
+        public int gameStatus = 0;
 
-        string[] cards;
-
-        public Player(string userID, int playerNumber, string room)
+        public Player(string userID, int playerNumber, int x, int y)
         {
             this.userID = userID;
             this.playerNumber = playerNumber;
-            this.room = room;
+            this.x = x;
+            this.y = y;
+            cards = new List<string>();
+            gameStatus = 0;
         }
 
-        //public string userName
-        //{
-        //    get { return userName; }
-        //    set { userName = value; }
-        //}
-
-        public bool movePlayer(Grid grid, int x, int y, int diceroll)
+        public bool movePlayer(Grid grid, int x, int y, int diceroll) //returns bool to tell gamemanager whether a move occured or not
         {
-            //diceroll = GameCommands.roll;
-            if (GameCommands.roll != 0)
+            int movement = (Math.Abs(this.x - x) + Math.Abs(this.y - y)); // very simple movement, straight line distance
+                                                                          //could be improved but not enough time and
+                                                                          //will very rarely produce incorrect results
+                                                                          //due to the wide open game board
+            if (movement > diceroll)
             {
-                int movement = (Math.Abs(this.x - x) + Math.Abs(this.y - y));
-                if (movement > diceroll)
+                Console.WriteLine("\nMovement out of bounds, please try again");
+                return false;
+            }
+
+            if (grid.gridID[x, y] > 0 && grid.gridID[x, y] != playerNumber
+                ) //if there is a player and it's not you
+            {
+                Console.WriteLine("\nCan't move on top of another player, please try again");
+                return false;
+            }
+
+            if (grid.blocked[x, y] == true)
+            {
+                Console.WriteLine("\nThis space is blocked, please try again");
+                return false;
+            }
+
+            for (int j = -1; j < 2; j++)
+            {
+                for (int i = -1; i < 2; i++)
                 {
-                    //Context.Channel.SendMessageAsync("Movement out of bounds, please try again");
-                    return false;
-                }
-                else
-                {
-                    grid.gridID[this.x, this.y] = 0;
-                    grid.gridID[x, y] = playerNumber;
-                    return true;
+                    if (grid.roomID[x + i, y + j] > 0 //if the space you're trying to move to is next to a door 
+                        && (x + i != x || y + j != y)) //if the space you're trying to move to is not the door itself
+                    {
+                        Console.WriteLine("\nYou cannot occupy the space in front of a door. Please try again");
+                        return false;
+                        //this is to hopefully stop players blocking eachother from entering doors. hopefully
+                    }
                 }
             }
 
-            else
-                return false;
-            
+            grid.gridID[this.x, this.y] = 0;
+            grid.gridID[x, y] = playerNumber;
+            this.x = x;
+            this.y = y;
+            return true;
+
         }
 
         public int CompareTo(Player other)
         {
-            return userID.CompareTo(other.userID);
+            return playerNumber.CompareTo(other.playerNumber);
         }
 
+        /*
         public int CompareTo(string other)
         {
             return userID.CompareTo(other);
         }
+        */
     }
 }
