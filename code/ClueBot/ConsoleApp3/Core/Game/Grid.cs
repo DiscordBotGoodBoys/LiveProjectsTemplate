@@ -45,7 +45,7 @@ namespace ClueBot.Core.Commands
             foreach (Player item in players)
             {
                 if (item != null)
-                    gridID[item.x, item.y] = item.id;
+                    gridID[item.x, item.y] = item.playerNumber;
             }
         }
         public void drawGrid() //draws the contents of the grid, as well as the borders around it with coordinates
@@ -102,7 +102,7 @@ namespace ClueBot.Core.Commands
                 blocked[15, j] = false; //bowlarama
 
             for (int j = 0; j < 6; j++)
-                for (int i = 18; i < 25; i++)
+                for (int i = 18; i < 24; i++)   //changed from 25 to 24
                     blocked[i, j] = true; //kwik-e-mart
 
             for (int j = 9; j < 15; j++)
@@ -130,14 +130,14 @@ namespace ClueBot.Core.Commands
                     blocked[i, j] = true; //simpsons house
 
             for (int j = 18; j < 24; j++)
-                for (int i = 19; i < 25; i++)
+                for (int i = 19; i < 24; i++)   //25 to 24
                     blocked[i, j] = true; //retirement castle
             blocked[19, 18] = false;
 
             //SPAWN POINTS
             blocked[7, 0] = false; //col mustard
-            blocked[24, 9] = false; // mrs white
-            blocked[24, 14] = false; // rev green
+            blocked[23, 9] = false; // mrs white        24 to 23
+            blocked[23, 14] = false; // rev green
             blocked[18, 23] = false; // mrs peacock
             blocked[5, 23] = false; // prof. plum
             blocked[0, 7] = false; //mrs scarlett

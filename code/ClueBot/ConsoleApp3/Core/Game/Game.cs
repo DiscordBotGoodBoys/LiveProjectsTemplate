@@ -9,6 +9,9 @@ namespace ClueBot.Core.Commands
 {
     public class Game : ModuleBase<SocketCommandContext>
     {
+        public static string listOfEverything = "";
+
+        //game states
         public static bool gameHosting = false;
         public static bool gameStart = false;
         public static bool gamePlaying = false;
@@ -16,6 +19,13 @@ namespace ClueBot.Core.Commands
         public static int playerTurn = 0;
         public static int currentPlayers = 0;
         public static int roll = 0;
+
+        public static string suggestedWeapon = "";
+        public static string suggestedUser = "";
+        public static string suggestedRoom = "";
+        public static bool suggestionInProgress = false;
+        public static bool accusationInProgress = false;
+
 
         public static string gameState = "Null";
 
@@ -26,22 +36,30 @@ namespace ClueBot.Core.Commands
         {
             //Checks if there are enough players in the game.
             //Note that this will break if player 2 is removed and nobody replaces them.
-            if (PlayerExists(1))
-            {
+            
+            //if (PlayerExists(1))
+            //{
                 gameStart = true;
                 gameState = "Starting";
-            }
+            //}
 
-            else
-            {
-                await Context.Channel.SendMessageAsync("There are not enough players to start the game.");
-                return;
-            }
+            //else
+            //{
+            //    await Context.Channel.SendMessageAsync("There are not enough players to start the game.");
+            //    return;
+            //} 
+            ///COMMENTED FOR DEBUGGING. REMOVE ON COMPLETION.
+            
 
             Grid grid = new Grid(24, 25);
             grid.initializeGrid(player);
             grid.AssignStandardWalls();
             MurderScenario murderScenario = new MurderScenario(player);
+
+            listOfEverything = "";
+            SendListToBuffer(ref listOfEverything, murderScenario);
+
+
 
             //DEBUG BLOCK (displays the three murder cards, and then each player's hand
             foreach (string card in murderScenario.murderList)
@@ -122,22 +140,19 @@ namespace ClueBot.Core.Commands
 
         public async Task Turn(Player player, Player[] players, Grid grid, MurderScenario murderScenario)
         {
-            Console.Write("Player " + playerTurn + "'s turn. ");
+            await Context.Channel.SendMessageAsync("Player " + playerTurn + "'s turn. ");
             if (grid.roomID[player.x, player.y] > 0)
             {
-                await Context.Channel.SendMessageAsync("You are currently in the " + murderScenario.roomList[grid.roomID[player.x, player.y] - 1] + ".");
-                await Context.Channel.SendMessageAsync("Would you like to make a suggestion? Enter 0 for no, 1 for yes");
-                ConsoleKeyInfo cki = Console.ReadKey();
-                SpinWait.SpinUntil(() => cki != null);
-                int choice = Convert.ToInt32(cki.Key.ToString());
-                if (choice == 1)
+                await Context.Channel.SendMessageAsync("You are currently in the " + murderScenario.roomList[grid.roomID[player.x, player.y] - 1] + ". " +
+                    "Make a ?suggestion, ?accuse someone, or ?roll the dice.");
+                gameState = "RollSuggest";
+                
+                SpinWait.SpinUntil(() => suggestionInProgress || roll > 0 || accusationInProgress);
+                
+                if (suggestionInProgress)
                 {
-                    Suggest(player, players, grid.roomID[player.x, player.y], murderScenario);
+                    await Suggest(player, players, grid.roomID[player.x, player.y], murderScenario);
                     return /*false*/;
-                }
-                else
-                {
-
                 }
             }
             Console.WriteLine("Would you like to make an accusation? WARNING: Accusing incorrectly will kick you out of the game, so you should only do this when you're certaion of whodunnit!");
@@ -175,23 +190,14 @@ namespace ClueBot.Core.Commands
             }
             return/* false*/;
         }
-        private static void Suggest(Player player, Player[] players, int roomID, MurderScenario murderScenario)
+        private async Task Suggest(Player player, Player[] players, int roomID, MurderScenario murderScenario)
         {
             bool suggestionReady = false;
             int weaponChoice = 0;
             int personChoice = 0;
             while (!suggestionReady)
             {
-                Console.Write("\nSuggest a weapon from the weapon list: ");
-                foreach (string weapon in murderScenario.weaponList)
-                    Console.Write(weapon + ", ");
-                Console.WriteLine();
-                weaponChoice = Convert.ToInt32(Console.ReadLine());
-                Console.Write("\nSuggest a person from the person list: ");
-                foreach (string person in murderScenario.personList)
-                    Console.Write(person + ", ");
-                Console.WriteLine();
-                personChoice = Convert.ToInt32(Console.ReadLine());
+                
 
                 Console.WriteLine("You suggest that " + murderScenario.personList[personChoice - 1] + " comitted murder in the " + murderScenario.roomList[roomID - 1] + " with the " + murderScenario.weaponList[weaponChoice - 1]);
                 Console.WriteLine("Are you happy with this suggestion? 1 for yes 0 for no");
@@ -374,6 +380,22 @@ namespace ClueBot.Core.Commands
             }
             Console.WriteLine("Invalid coordinates, please re-enter as letter then number, i.e. e15 or B4.");
             return false;
+        }
+
+        void SendListToBuffer(ref string buffer, MurderScenario murderScenario)
+        {
+
+            buffer = "Weapons: ";
+            foreach (string weapon in murderScenario.weaponList)
+                buffer += weapon + ", ";
+
+            buffer += ".\nPlayers: ";
+            foreach (string person in murderScenario.personList)
+                buffer += person + ", ";
+
+            buffer += ".\nRooms: ";
+            foreach (string person in murderScenario.roomList)
+                buffer += person + ", ";
         }
 
 

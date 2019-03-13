@@ -16,5 +16,10 @@ namespace ClueBot.Core.Commands
             Embed.WithDescription("Play *Cluedo* with your friends!");  //Description
             await Context.Channel.SendMessageAsync("", false, Embed.Build());   //Send embed as message
         }
+
+        
+            
+
+        
     }
 }   
