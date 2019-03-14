@@ -29,7 +29,7 @@ namespace ClueBot.Core.Moderation
                 var Invites = await Guild.GetInvitesAsync();
                 if (Invites.Count() < 1)
                 { 
-                    Guild.TextChannels.First().CreateInviteAsync();
+                    //Guild.TextChannels.First().CreateInviteAsync();
                 }
 
                 Invites = null;

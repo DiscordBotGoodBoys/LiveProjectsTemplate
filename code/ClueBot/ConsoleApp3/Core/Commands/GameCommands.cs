@@ -7,16 +7,13 @@ namespace ClueBot.Core.Commands
 {
     public class GameCommands : ModuleBase<SocketCommandContext> //<ShardedCommandContext>
     {
-
-        
-
-        [Command("MoveTowards"), Summary("Moves the player towards a place.")]
+        [Command("Move"), Alias("MoveTo"), Summary("Moves the player towards a place.")]
         public async Task Move(string coords)
         {
             if(Game.gameState.Contains("Move") 
                 && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //Checks if the correct user is using the command
             {
-
+                Game.userCoords = coords;
             }
         }
 
@@ -29,9 +26,11 @@ namespace ClueBot.Core.Commands
                 Embed.WithColor(55, 0, 255);
                 Embed.WithTitle("Players, Weapons and Rooms");
                 Embed.WithDescription(Game.listOfEverything);
+                await Context.Channel.SendMessageAsync("", false, Embed.Build());
             }
         }
-        [Command("Suggest"), Summary("Suggests [person] with [weapon] in [location].")]
+
+        [Command("Suggest"), Alias("Suggestion"), Summary("Suggests [person] with [weapon] in [location].")]
         public async Task Suggest(IUser user = null, string weapon = null,  string room = null)
         {
             if (Game.gameState.Contains("Suggest")
@@ -44,16 +43,23 @@ namespace ClueBot.Core.Commands
 
                 await Context.Channel.SendMessageAsync(Context.User + " suggested that " + user + 
                     " committed the murder with the " + weapon + " in the " + room + ".");
+                //Context.User.SendMessageAsync
             }
         }
 
-        [Command("Accuse"), Summary("Accuses [person] with [weapon] in [location].")]
-        public async Task Accuse()
+        [Command("Accuse"), Alias ("Accusation"), Summary("Accuses [person] with [weapon] in [location].")]
+        public async Task Accuse(IUser user = null, string weapon = null, string room = null)
         {
             if (Game.gameState.Contains("Suggest")
                 && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //Checks if the correct user is using the command
             {
+                Game.suggestionInProgress = true;
+                Game.suggestedWeapon = weapon;
+                Game.suggestedUser = user.Id.ToString();
+                Game.suggestedRoom = room;
 
+                await Context.Channel.SendMessageAsync(Context.User + " accused " + user +
+                    " of committing the murder with the " + weapon + " in the " + room + ".");
             }
         }
 

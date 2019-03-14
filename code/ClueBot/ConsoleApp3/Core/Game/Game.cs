@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,15 +11,16 @@ namespace ClueBot.Core.Commands
     public class Game : ModuleBase<SocketCommandContext>
     {
         public static string listOfEverything = "";
+        public string gridBuffer = "No grid is active.";
 
         //game states
         public static bool gameHosting = false;
-        public static bool gameStart = false;
         public static bool gamePlaying = false;
 
         public static int playerTurn = 0;
         public static int currentPlayers = 0;
         public static int roll = 0;
+        public static string userCoords = "";
 
         public static string suggestedWeapon = "";
         public static string suggestedUser = "";
@@ -31,35 +33,29 @@ namespace ClueBot.Core.Commands
 
         public static Player[] player = new Player[5];
 
+        public Grid grid = new Grid(25, 24, player);
+        
+
         [Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
         public async Task StartGame()
         {
             //Checks if there are enough players in the game.
             //Note that this will break if player 2 is removed and nobody replaces them.
-            
-            //if (PlayerExists(1))
-            //{
-                gameStart = true;
-                gameState = "Starting";
-            //}
+            /*if (!PlayerExists(1))
+            {
+                await Context.Channel.SendMessageAsync("There are not enough players to start the game.");
+                return;
+            }
+            */
 
-            //else
-            //{
-            //    await Context.Channel.SendMessageAsync("There are not enough players to start the game.");
-            //    return;
-            //} 
-            ///COMMENTED FOR DEBUGGING. REMOVE ON COMPLETION.
-            
+            //grid.initializeGrid(player);
+            grid.drawGrid(ref gridBuffer);
+            Console.WriteLine(gridBuffer);
 
-            Grid grid = new Grid(24, 25);
-            grid.initializeGrid(player);
-            grid.AssignStandardWalls();
             MurderScenario murderScenario = new MurderScenario(player);
 
             listOfEverything = "";
             SendListToBuffer(ref listOfEverything, murderScenario);
-
-
 
             //DEBUG BLOCK (displays the three murder cards, and then each player's hand
             foreach (string card in murderScenario.murderList)
@@ -69,64 +65,86 @@ namespace ClueBot.Core.Commands
             {
                 if (player != null)
                 {
-                    Console.Write("Player " + player.playerNumber + "'s cards: ");
+                    Console.Write("Player " + (player.playerNumber + 1) + "'s cards: ");
                     foreach (string card in player.cards)
                         Console.Write(card + ", ");
                     Console.Write('\n');
                 }
             }
             //DEBUG BLOCK END
-            
 
-
-            if (gameStart)
-            {
-                currentPlayers = 0;
-                foreach(Player player in player)
-                {
-                    currentPlayers++;
-                }
-
-                await Context.Channel.SendMessageAsync("Dealing cards...");
-
-                await Context.Channel.SendMessageAsync("Randomising player and weapon positions...");
-                //Randomise weapon and player positions.
-
-                await Context.Channel.SendMessageAsync("The game has begun!");
-
-                gamePlaying = true;
-                gameStart = false;
-                playerTurn = 0;
-                gameState = "Roll";
+            currentPlayers = 0;
+            foreach(Player player in player)
+            { 
+                currentPlayers++;   //Currently broken; also counts null
             }
+
+            await Context.Channel.SendMessageAsync("The game has begun!");
+
+            gamePlaying = true;
+            playerTurn = 0;
+            gameState = "Roll";
+            
 
             while (gamePlaying)
             {
-                /*
-                Console.WriteLine("Roll Phase");
-
-                //if (gameState == "Roll")  //Put roll logic in here if necessary.
-                //{
-
-                //}
-                await Context.Channel.SendMessageAsync("Player " + (playerTurn+1) + "'s turn. ?Roll the dice!");
-                SpinWait.SpinUntil(() => roll > 0);
-                gameState = "Moving";
-                Console.WriteLine("Move Phase");
-
-                Turn(player[playerTurn], grid);
-                //SpinWait.SpinUntil(() => player[playerTurn].);
-
-
-                roll = 0;
-                playerTurn++;
-                if (playerTurn > currentPlayers)
-                    playerTurn = 1;
-                */
-                await Turn(player[playerTurn], player, grid, murderScenario);
+                string winner = "";
+                switch (GameStatus(player)) //checks if game has ended
+                {
+                    case 1: //if ended due to a player winning
+                        for (int i = 0; i < player.Length; i++)
+                        if (player[i] != null)
+                            if (player[i].gameStatus == 1) //find the winner
+                                winner = player[i].userID;
+                    Console.WriteLine("GAME WON BY " + winner + " VIA ACCUSATION");
+                    gamePlaying = false;
+                    break;
+                    case -1: //if ended due to all but one players losing
+                        for (int i = 0; i < player.Length; i++)
+                        if (player[i] != null)
+                            if (player[i].gameStatus != -1) //the winner is the one that isn't a loser
+                                winner = player[i].userID;
+                    Console.WriteLine("GAME WON BY " + winner + " BY LAST MAN STANDING");
+                    gamePlaying = false;
+                    break;
+                    default: //if the game hasn't ended, do the following
+                    if (player[playerTurn] != null && player[playerTurn].gameStatus != -1)
+                    // the != null check comes into play if there are less than 6 players
+                    // gameStatus != -1 checks if the player hasn't lost and can no longer have turns
+                    {
+                        await Turn(player[playerTurn], player, grid, murderScenario);
+                        if (gameState == "Won")
+                        //runs the current players turn. if they win, return true. if they don't, return false
+                        {
+                            gamePlaying = false;
+                        }
+                        else
+                        {
+                            grid.drawGrid(ref gridBuffer);
+                        }
+                    }
+                    playerTurn++; //cycle to the next player
+                    if (playerTurn >= 6) //if you go out of the array bounds
+                        playerTurn = 0; //the next player cycles back around to 0
+                    break;
+                }
             }
-                
+        }
+
+        [Command("Grid"), Summary("Displays the grid.")]
+        public async Task PrintGrid()
+        {
+            EmbedBuilder Embed = new EmbedBuilder();
+            Embed.WithColor(55, 0, 255);
+            Embed.WithTitle("Grid");
+
+            grid.drawGrid(ref gridBuffer);
+            Console.WriteLine(gridBuffer);
             
+
+            Embed.WithDescription(gridBuffer);
+            await Context.Channel.SendMessageAsync(gridBuffer);
+            await Context.Channel.SendMessageAsync("", false, Embed.Build()); //2048 characters allowed
         }
 
         //Checks if player playerNumber has been added to the game.
@@ -138,89 +156,91 @@ namespace ClueBot.Core.Commands
 
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
         public async Task Turn(Player player, Player[] players, Grid grid, MurderScenario murderScenario)
         {
-            await Context.Channel.SendMessageAsync("Player " + playerTurn + "'s turn. ");
             if (grid.roomID[player.x, player.y] > 0)
             {
-                await Context.Channel.SendMessageAsync("You are currently in the " + murderScenario.roomList[grid.roomID[player.x, player.y] - 1] + ". " +
+                await PrintGrid();
+                await Context.Channel.SendMessageAsync("Player " + (playerTurn+1) + "'s turn. You are currently in the " + murderScenario.roomList[grid.roomID[player.x, player.y] - 1] + ". " +
                     "Make a ?suggestion, ?accuse someone, or ?roll the dice.");
                 gameState = "RollSuggest";
                 
                 SpinWait.SpinUntil(() => suggestionInProgress || roll > 0 || accusationInProgress);
-                
+
+                if (suggestionInProgress)
+                {
+                    await Suggest(player, players, grid.roomID[player.x, player.y], murderScenario);
+                    return /*false*/;
+                }
+
+                if (accusationInProgress)
+                {
+                    await Accuse(player, murderScenario);
+                    return /*false*/;
+                }
+            }
+
+            if (roll == 0) 
+                await Context.Channel.SendMessageAsync("Player " + (playerTurn + 1) + "'s turn. ?Roll the dice!");
+            SpinWait.SpinUntil(() => roll > 0);
+
+            gameState = "Move";
+            bool movementValid = false;
+            int x = 0;
+            int y = 0;
+            while (!movementValid)
+            {
+                await Context.Channel.SendMessageAsync("Use ?move [coords] to move. Coordinates take the form of letter then number, i.e. e15 or B4. ");
+                x = 0;
+                y = 0;
+                userCoords = "";
+                SpinWait.SpinUntil(() => userCoords != "");
+                if (InterpretCoords(userCoords, ref x, ref y))
+                {
+                    movementValid = player.MovePlayer(grid, x, y, roll);
+                }
+            }
+
+            if (grid.roomID[x, y] > 0)
+            {
+                await Context.Channel.SendMessageAsync("You can now ?suggest a case. (?Suggest [@person] [weapon] [location])");
+                SpinWait.SpinUntil(() => suggestionInProgress);
                 if (suggestionInProgress)
                 {
                     await Suggest(player, players, grid.roomID[player.x, player.y], murderScenario);
                     return /*false*/;
                 }
             }
-            Console.WriteLine("Would you like to make an accusation? WARNING: Accusing incorrectly will kick you out of the game, so you should only do this when you're certaion of whodunnit!");
-            Console.WriteLine("Enter 0 for no, 1 for yes.");
-            int willAccuse = 0;
-            willAccuse = Convert.ToInt32(Console.ReadLine());
-            if (willAccuse == 1)
-            {
-                //gameWon = true;
-                Accuse(player, murderScenario);
-                return;
-            }
-            else
-            {
-                await Context.Channel.SendMessageAsync("Player " + (playerTurn + 1) + "'s turn. ?Roll the dice!");
-                SpinWait.SpinUntil(() => roll > 0);
-                Console.ReadKey();
-                
-                bool movementValid = false;
-                int x = 0;
-                int y = 0;
-                while (!movementValid)
-                {
-                    Console.Write("\nEnter coordinates taking the form of letter then number, i.e. e15 or B4: ");
-                    string coords = Console.ReadLine();
-                    x = 0;
-                    y = 0;
-                    if (InterpretCoords(coords, ref x, ref y))
-                        movementValid = player.movePlayer(grid, x, y, roll);
-                }
-                if (grid.roomID[x, y] > 0)
-                {
-                    Suggest(player, players, grid.roomID[x, y], murderScenario);
-                }
-            }
+            roll = 0;
             return/* false*/;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
         private async Task Suggest(Player player, Player[] players, int roomID, MurderScenario murderScenario)
         {
-            bool suggestionReady = false;
             int weaponChoice = 0;
             int personChoice = 0;
-            while (!suggestionReady)
-            {
-                
-
-                Console.WriteLine("You suggest that " + murderScenario.personList[personChoice - 1] + " comitted murder in the " + murderScenario.roomList[roomID - 1] + " with the " + murderScenario.weaponList[weaponChoice - 1]);
-                Console.WriteLine("Are you happy with this suggestion? 1 for yes 0 for no");
-                int choice = Convert.ToInt32(Console.ReadLine());
-                if (choice == 1)
-                    suggestionReady = true;
-            }
             Player nearestPlayerWithCards = CheckPlayersForCards(player.playerNumber, players, murderScenario.personList[personChoice - 1], murderScenario.roomList[roomID - 1], murderScenario.weaponList[weaponChoice - 1]);
             if (nearestPlayerWithCards == null)
             {
-                Console.WriteLine("The cards you suggested are not held by any of your fellow detectives...");
-                Console.WriteLine("Press any key to continue");
-                Console.ReadKey();
+                await Context.Channel.SendMessageAsync("The cards you suggested are not held by any of your fellow detectives...");
             }
             else
             {
-                Console.WriteLine(nearestPlayerWithCards.userID + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
+                await Context.Channel.SendMessageAsync(nearestPlayerWithCards.userID + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
                 string cardToShow = ChooseCardToShow(nearestPlayerWithCards, player, murderScenario.personList[personChoice - 1], murderScenario.roomList[roomID - 1], murderScenario.weaponList[weaponChoice - 1]);
-                Console.WriteLine(nearestPlayerWithCards.userID + " shows you " + cardToShow + ". Press any key to continue."); //this needs to be sent in a DM to the player
-                Console.ReadKey();
+                //Context.User.SendMessageAsync(nearestPlayerWithCards.userID + " shows you " + cardToShow + ".");
+                //Must be DM'ed to the player.
+
             }
         }
-        private static bool Accuse(Player player, MurderScenario murderScenario)
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private /*static bool */ async Task Accuse(Player player, MurderScenario murderScenario)
         //currently there's no way to escape an accusation after initiating one
         {
             bool accusationReady = false;
@@ -262,16 +282,19 @@ namespace ClueBot.Core.Commands
                 player.gameStatus = 1;
                 Console.WriteLine("CONGRATULATIONS! You have cracked the case! " + murderScenario.personList[personChoice - 1] + " goes behind bars and you win the game! Press any key to continue.");
                 Console.ReadKey();
-                return true;
+                return /*true*/;
             }
             else
             {
                 player.gameStatus = -1;
                 Console.WriteLine("False accusations never solve anything. You got " + correctCards + " out of 3 cards correct, and are forced to retire from the case. Press any key to continue.");
                 Console.ReadKey();
-                return false;
+                return /*false*/;
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        
         private static string ChooseCardToShow(Player player, Player suggestingPlayer, string personChoice, string roomChoice, string weaponChoice)
         {
             //in the real life board game, this function represents a player who has a suggested card
@@ -303,6 +326,9 @@ namespace ClueBot.Core.Commands
                 return cards[choice - 1];
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
         private static Player CheckPlayersForCards(int currentPlayer, Player[] players, string personChoice, string roomChoice, string weaponChoice)
         //this function is akin to asking clockwise around the table if anyone has the cards you suggested
         //the first person clockwise to you who has a card you suggested in their hand is returned in this function
@@ -329,6 +355,9 @@ namespace ClueBot.Core.Commands
             }
             return null;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
         public static int GameStatus(Player[] players) //runs at the start of every turn to check whether the game is over
         {
             int activePlayersCount = 0;
@@ -340,7 +369,6 @@ namespace ClueBot.Core.Commands
                     {
                         case 1:
                             return 1; //if a players state is 1 they have won
-                            break;
                         case 0:
                             activePlayersCount++; //if a players state is 0 they are still playing
                             break;
@@ -353,6 +381,9 @@ namespace ClueBot.Core.Commands
                 return -1;
             return 0;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
         private static bool InterpretCoords(string coords, ref int x, ref int y)
         //this is for ease of use for the end user. they enter coords as letter-number like in battleships
         //validates whether a coordinate is in the correct format, but not if it's possible (i.e. if you're trying to walk into a wall)
@@ -381,6 +412,8 @@ namespace ClueBot.Core.Commands
             Console.WriteLine("Invalid coordinates, please re-enter as letter then number, i.e. e15 or B4.");
             return false;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 
         void SendListToBuffer(ref string buffer, MurderScenario murderScenario)
         {

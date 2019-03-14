@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,23 +8,28 @@ using System.Threading.Tasks;
 
 namespace ClueBot.Core.Commands
 {
-    public class Grid
+    public class Grid //: ModuleBase<SocketCommandContext>
     {
+        
         int x, y; // the dimensions of the grid
         public int[,] gridID; //the player ID stored in each square, 0 by default
         public string[] emoji; //will hopefully store emoji to be drawn once integrated with the discord bot
         public bool[,] blocked; //stores whether or not a space is a wall. false means no wall, and is the default setting
         public int[,] roomID; //stores the location of a door, that connects to the room ID stored. 0 by default
-        public Grid(int x, int y)
+        public Grid(int x, int y, Player[] player)
         {
             this.x = x;
             this.y = y;
             gridID = new int[x, y];
             roomID = new int[x, y];
             blocked = new bool[x, y];
+            initializeGrid(player);
+            
         }
 
-        public void initializeGrid() // set all grid locations to their default values
+        
+
+        public async Task initializeGrid() // set all grid locations to their default values
         {
             for (int j = 0; j < y; j++)
                 for (int i = 0; i < x; i++)
@@ -31,8 +38,10 @@ namespace ClueBot.Core.Commands
                     roomID[i, j] = 0;
                     blocked[i, j] = false;
                 }
+            await AssignStandardWalls();
         }
-        public void initializeGrid(Player[] players) // set all grid locations to their default values
+
+        public async Task initializeGrid(Player[] players) // set all grid locations to their default values
                                                     // ...then put players in their spawn locations
         {
             for (int j = 0; j < y; j++)
@@ -47,43 +56,11 @@ namespace ClueBot.Core.Commands
                 if (item != null)
                     gridID[item.x, item.y] = item.playerNumber;
             }
+            await AssignStandardWalls();
         }
-        public void drawGrid() //draws the contents of the grid, as well as the borders around it with coordinates
-        {
-            Console.Write(" X|");
-            for (int i = 0; i < x; i++)
-                if (i < 10)
-                    Console.Write(i + " |");
-                else
-                    Console.Write(i + "|");
-            Console.Write('\n' + "--|");
-            for (int i = 0; i < x; i++)
-                Console.Write("---");
-            Console.Write('\n');
-            for (int j = 0; j < y; j++)
-            {
-                Console.Write((char)(j + 97) + " |");
-                for (int i = 0; i < x; i++)
-                {
-                    if (blocked[i, j])
-                    {
-                        Console.Write("██|"); //where walls are drawn
-                    }
-                    else if (roomID[i, j] > 0)
-                    {
-                        Console.Write(" \\|"); //where doors are drawn
-                    }
-                    else
-                        Console.Write(gridID[i, j] + " |"); //where playerIDs are drawn
-                }
-                Console.Write('\n' + "--|");
-                for (int i = 0; i < x; i++)
-                    Console.Write("---");
-                Console.Write('\n');
-            }
-        }
-        public void AssignStandardWalls()//applies the walls/blocking from the original cluedo board (rotated 90 degrees anticlockwise)
-                                         //can only work fully properly on a grid of size (25, 24) - standard size
+
+        public async Task AssignStandardWalls()//applies the walls/blocking from the original cluedo board (rotated 90 degrees anticlockwise)
+                                              //can only work fully properly on a grid of size (25, 24) - standard size
         {
             for (int j = 0; j < y; j++)
                 for (int i = 0; i < x; i++)
@@ -102,7 +79,7 @@ namespace ClueBot.Core.Commands
                 blocked[15, j] = false; //bowlarama
 
             for (int j = 0; j < 6; j++)
-                for (int i = 18; i < 24; i++)   //changed from 25 to 24
+                for (int i = 18; i < 25; i++)   //changed from 25 to 24
                     blocked[i, j] = true; //kwik-e-mart
 
             for (int j = 9; j < 15; j++)
@@ -130,14 +107,14 @@ namespace ClueBot.Core.Commands
                     blocked[i, j] = true; //simpsons house
 
             for (int j = 18; j < 24; j++)
-                for (int i = 19; i < 24; i++)   //25 to 24
+                for (int i = 19; i < 25; i++)   //25 to 24
                     blocked[i, j] = true; //retirement castle
             blocked[19, 18] = false;
 
             //SPAWN POINTS
             blocked[7, 0] = false; //col mustard
-            blocked[23, 9] = false; // mrs white        24 to 23
-            blocked[23, 14] = false; // rev green
+            blocked[24, 9] = false; // mrs white        24 to 23
+            blocked[24, 14] = false; // rev green
             blocked[18, 23] = false; // mrs peacock
             blocked[5, 23] = false; // prof. plum
             blocked[0, 7] = false; //mrs scarlett
@@ -184,5 +161,98 @@ namespace ClueBot.Core.Commands
             blocked[6, 12] = false; //burns manor
             roomID[6, 12] = 9;
         }
+
+        /*
+        public void drawGrid(ref string gridBuffer) //draws the contents of the grid, as well as the borders around it with coordinates
+        {
+            //FOR CONSOLE
+            gridBuffer = "";
+            gridBuffer += " X|";
+            for (int i = 0; i < x; i++)
+                if (i < 10)
+                    gridBuffer += i + " |";
+                else
+                    gridBuffer += i + "|";
+            gridBuffer += '\n' + "--|";
+            for (int i = 0; i < x; i++)
+                gridBuffer += "---";
+            gridBuffer += '\n';
+            for (int j = 0; j < y; j++)
+            {
+                gridBuffer += (char)(j + 97) + " |";
+                for (int i = 0; i < x; i++)
+                {
+                    if (blocked[i, j])
+                    {
+                        gridBuffer += "██|"; //where walls are drawn
+                    }
+                    else if (roomID[i, j] > 0)
+                    {
+                        gridBuffer += " \\|"; //where doors are drawn
+                    }
+                    else
+                        gridBuffer += gridID[i, j] + " |"; //where playerIDs are drawn
+                }
+                gridBuffer += '\n' + "--|";
+                for (int i = 0; i < x; i++)
+                    gridBuffer += "---";
+                gridBuffer += '\n';
+            }
+        }
+        */
+
+        public void drawGrid(ref string gridBuffer) //draws the contents of the grid, as well as the borders around it with coordinates
+        {
+
+            //FOR EMOJI/DISCORD
+            gridBuffer = "";
+            gridBuffer += " X|";
+            for (int i = 0; i < x; i++)
+                if (i < 10)
+                    gridBuffer += i + " |";
+                else
+                    gridBuffer += i + "|";
+            gridBuffer += '\n' + "--|";
+            for (int i = 0; i < x; i++)
+                gridBuffer += "---";
+            gridBuffer += '\n';
+            for (int j = 0; j < y; j++)
+            {
+                gridBuffer += (char)(j + 97) + " |";
+                for (int i = 0; i < x; i++)
+                {
+                    if (blocked[i, j])
+                    {
+                        gridBuffer += ""; //where walls are drawn
+                    }
+                    else if (roomID[i, j] > 0)
+                    {
+                        gridBuffer += ""; //where doors are drawn
+                    }
+                    else
+                        switch(gridID[i, j])
+                        {
+                            case 0: gridBuffer += "   "; break;
+                            case 1: gridBuffer += ""; break;
+                            case 2: gridBuffer += ""; break;
+                            case 3: gridBuffer += ""; break;
+                            case 4: gridBuffer += ""; break;
+                            case 5: gridBuffer += ""; break;
+                            case 6: gridBuffer += ""; break;
+                            
+                                
+                                
+                                 
+                        }
+                        gridBuffer += gridID[i, j] + " |"; //where playerIDs are drawn
+                }
+                gridBuffer += '\n' + "--|";
+                for (int i = 0; i < x; i++)
+                    gridBuffer += "";
+                gridBuffer += '\n';
+            }
+        }
+
+
     }
 }

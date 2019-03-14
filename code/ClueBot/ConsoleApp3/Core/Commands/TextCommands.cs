@@ -16,10 +16,19 @@ namespace ClueBot.Core.Commands
             Embed.WithDescription("Play *Cluedo* with your friends!");  //Description
             await Context.Channel.SendMessageAsync("", false, Embed.Build());   //Send embed as message
         }
-
-        
             
+        [Command("EmbedTest"), Summary("Test")]
+        public async Task EmbedTest()
+        {
+            EmbedBuilder Embed = new EmbedBuilder();    //new EmbedBuilder
+            Embed.WithAuthor("Test");               //Author   
+            Embed.WithColor(55, 0, 255);                //Embed colour left outline
+            //Embed.WithFooter()                        //Footer if needed
+            Embed.WithDescription("");  //Description
+            await Context.Channel.SendMessageAsync("", false, Embed.Build());   //Send embed as message
+        }
 
-        
+
+
     }
 }   

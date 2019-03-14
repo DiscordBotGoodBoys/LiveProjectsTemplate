@@ -26,7 +26,7 @@ namespace ClueBot.Core.Commands
             gameStatus = 0;
         }
 
-        public bool movePlayer(Grid grid, int x, int y, int diceroll) //returns bool to tell gamemanager whether a move occured or not
+        public bool MovePlayer(Grid grid, int x, int y, int diceroll) //returns bool to tell gamemanager whether a move occured or not
         {
             int movement = (Math.Abs(this.x - x) + Math.Abs(this.y - y)); // very simple movement, straight line distance
                                                                           //could be improved but not enough time and
