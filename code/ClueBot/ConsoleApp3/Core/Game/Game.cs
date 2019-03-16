@@ -96,7 +96,8 @@ namespace ClueBot.Core.Commands
                         if (player[i] != null)
                             if (player[i].gameStatus == 1) //find the winner
                                 winner = player[i].userID;
-                    Console.WriteLine("GAME WON BY " + winner + " VIA ACCUSATION");
+                    await Context.Channel.SendMessageAsync("GAME WON BY " + winner + " VIA ACCUSATION");
+                    gameState = "Won";
                     gamePlaying = false;
                     break;
                     case -1: //if ended due to all but one players losing
@@ -104,7 +105,8 @@ namespace ClueBot.Core.Commands
                         if (player[i] != null)
                             if (player[i].gameStatus != -1) //the winner is the one that isn't a loser
                                 winner = player[i].userID;
-                    Console.WriteLine("GAME WON BY " + winner + " BY LAST MAN STANDING");
+                        await Context.Channel.SendMessageAsync("GAME WON BY " + winner + " BY LAST MAN STANDING");
+                        gameState = "Won";
                     gamePlaying = false;
                     break;
                     default: //if the game hasn't ended, do the following
@@ -121,6 +123,8 @@ namespace ClueBot.Core.Commands
                         else
                         {
                             grid.drawGrid(ref gridBuffer);
+                            Console.WriteLine(gridBuffer);
+                            await Context.Channel.SendMessageAsync(gridBuffer);
                         }
                     }
                     playerTurn++; //cycle to the next player
@@ -134,17 +138,9 @@ namespace ClueBot.Core.Commands
         [Command("Grid"), Summary("Displays the grid.")]
         public async Task PrintGrid()
         {
-            EmbedBuilder Embed = new EmbedBuilder();
-            Embed.WithColor(55, 0, 255);
-            Embed.WithTitle("Grid");
-
             grid.drawGrid(ref gridBuffer);
             Console.WriteLine(gridBuffer);
-            
-
-            Embed.WithDescription(gridBuffer);
             await Context.Channel.SendMessageAsync(gridBuffer);
-            await Context.Channel.SendMessageAsync("", false, Embed.Build()); //2048 characters allowed
         }
 
         //Checks if player playerNumber has been added to the game.
@@ -192,7 +188,6 @@ namespace ClueBot.Core.Commands
             int y = 0;
             while (!movementValid)
             {
-                await Context.Channel.SendMessageAsync("Use ?move [coords] to move. Coordinates take the form of letter then number, i.e. e15 or B4. ");
                 x = 0;
                 y = 0;
                 userCoords = "";
@@ -232,7 +227,7 @@ namespace ClueBot.Core.Commands
             {
                 await Context.Channel.SendMessageAsync(nearestPlayerWithCards.userID + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
                 string cardToShow = ChooseCardToShow(nearestPlayerWithCards, player, murderScenario.personList[personChoice - 1], murderScenario.roomList[roomID - 1], murderScenario.weaponList[weaponChoice - 1]);
-                //Context.User.SendMessageAsync(nearestPlayerWithCards.userID + " shows you " + cardToShow + ".");
+                await Context.User.SendMessageAsync(nearestPlayerWithCards.userID + " shows you " + cardToShow + ".");
                 //Must be DM'ed to the player.
 
             }
@@ -243,52 +238,34 @@ namespace ClueBot.Core.Commands
         private /*static bool */ async Task Accuse(Player player, MurderScenario murderScenario)
         //currently there's no way to escape an accusation after initiating one
         {
-            bool accusationReady = false;
             int weaponChoice = 0;
             int roomChoice = 0;
             int personChoice = 0;
-            while (!accusationReady)
-            {
-                Console.Write("\nChoose a weapon from the weapon list: ");
-                foreach (string weapon in murderScenario.weaponList)
-                    Console.Write(weapon + ", ");
-                Console.WriteLine();
-                weaponChoice = Convert.ToInt32(Console.ReadLine());
-                Console.Write("\nChoose a room from the room list: ");
-                foreach (string room in murderScenario.roomList)
-                    Console.Write(room + ", ");
-                Console.WriteLine();
-                roomChoice = Convert.ToInt32(Console.ReadLine());
-                Console.Write("\nChoose a person from the person list: ");
-                foreach (string person in murderScenario.personList)
-                    Console.Write(person + ", ");
-                Console.WriteLine();
-                personChoice = Convert.ToInt32(Console.ReadLine());
 
-                Console.WriteLine("You accuse " + murderScenario.personList[personChoice - 1] + " of comitting murder in the " + murderScenario.roomList[roomChoice - 1] + " with the " + murderScenario.weaponList[weaponChoice - 1]);
-                Console.WriteLine("Are you happy with this accusation? 1 for yes 0 for no");
-                int choice = Convert.ToInt32(Console.ReadLine());
-                if (choice == 1)
-                    accusationReady = true;
-            }
             int correctCards = 0;
             foreach (string murderCard in murderScenario.murderList)
             {
-                if (murderCard.Equals(murderScenario.personList[personChoice - 1]) || murderCard.Equals(murderScenario.roomList[roomChoice - 1]) || murderCard.Equals(murderScenario.weaponList[weaponChoice - 1]))
+                if (murderCard.Equals(murderScenario.personList[personChoice - 1]) 
+                    || murderCard.Equals(murderScenario.roomList[roomChoice - 1]) 
+                    || murderCard.Equals(murderScenario.weaponList[weaponChoice - 1]))
                     correctCards++;
             }
+
             if (correctCards == 3)
             {
                 player.gameStatus = 1;
-                Console.WriteLine("CONGRATULATIONS! You have cracked the case! " + murderScenario.personList[personChoice - 1] + " goes behind bars and you win the game! Press any key to continue.");
-                Console.ReadKey();
+                await Context.Channel.SendMessageAsync("CONGRATULATIONS! You have cracked the case! " 
+                    + murderScenario.personList[personChoice - 1] + " goes behind bars and you win the game!");
+                gameState = "Won";
+                
                 return /*true*/;
             }
+
             else
             {
                 player.gameStatus = -1;
-                Console.WriteLine("False accusations never solve anything. You got " + correctCards + " out of 3 cards correct, and are forced to retire from the case. Press any key to continue.");
-                Console.ReadKey();
+                await Context.Channel.SendMessageAsync("False accusations never solve anything. You got " +
+                    correctCards + " out of 3 cards correct, and are forced to retire from the case.");
                 return /*false*/;
             }
         }
@@ -430,8 +407,5 @@ namespace ClueBot.Core.Commands
             foreach (string person in murderScenario.roomList)
                 buffer += person + ", ";
         }
-
-
-
     }
 }

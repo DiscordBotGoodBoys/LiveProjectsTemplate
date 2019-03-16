@@ -162,45 +162,59 @@ namespace ClueBot.Core.Commands
             roomID[6, 12] = 9;
         }
 
-        /*
+        
         public void drawGrid(ref string gridBuffer) //draws the contents of the grid, as well as the borders around it with coordinates
         {
             //FOR CONSOLE
             gridBuffer = "";
-            gridBuffer += " X|";
-            for (int i = 0; i < x; i++)
-                if (i < 10)
+            gridBuffer += "```\n";
+            gridBuffer += "X|";
+            for (int i = 0; i <= x; i++)
+                if (i < 10 && i != 0)
                     gridBuffer += i + " |";
-                else
+                else if (i != 25)
                     gridBuffer += i + "|";
-            gridBuffer += '\n' + "--|";
-            for (int i = 0; i < x; i++)
-                gridBuffer += "---";
-            gridBuffer += '\n';
+                else
+                    gridBuffer += i;
+            gridBuffer += '\n' + "-|";
+//            for (int i = 0; i < x; i++)
+//                gridBuffer += "---";
+//            gridBuffer += '\n';
             for (int j = 0; j < y; j++)
             {
-                gridBuffer += (char)(j + 97) + " |";
+                gridBuffer += (char)(j + 97) + "|"; // [space]| to |
                 for (int i = 0; i < x; i++)
                 {
                     if (blocked[i, j])
                     {
-                        gridBuffer += "██|"; //where walls are drawn
+                        gridBuffer += "██"; //where walls are drawn
+                        if (i != x - 1)
+                            gridBuffer += "|";
                     }
                     else if (roomID[i, j] > 0)
                     {
                         gridBuffer += " \\|"; //where doors are drawn
                     }
                     else
-                        gridBuffer += gridID[i, j] + " |"; //where playerIDs are drawn
+                    {
+                        gridBuffer += gridID[i, j]; //where playerIDs are drawn
+                        if (i != x - 1)
+                            gridBuffer += " |";
+                    }
                 }
-                gridBuffer += '\n' + "--|";
-                for (int i = 0; i < x; i++)
-                    gridBuffer += "---";
-                gridBuffer += '\n';
+                if (j != y-1)
+                    gridBuffer += '\n' + "-|";
+                //               for (int i = 0; i < x; i++)
+                //                   gridBuffer += "---";
+                //               gridBuffer += '\n';
+                
             }
-        }
-        */
 
+            gridBuffer += "```";
+        }
+        
+
+        /*
         public void drawGrid(ref string gridBuffer) //draws the contents of the grid, as well as the borders around it with coordinates
         {
 
@@ -252,6 +266,7 @@ namespace ClueBot.Core.Commands
                 gridBuffer += '\n';
             }
         }
+        */
 
 
     }

@@ -45,7 +45,5 @@ namespace ClueBot.Core.Commands
             await Context.Channel.SendMessageAsync("", false, Embed.Build());
 
         }
-        
-
     }
 }   

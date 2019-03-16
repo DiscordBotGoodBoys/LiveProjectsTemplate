@@ -72,7 +72,7 @@ namespace ClueBot.Core.Commands
                 Game.roll = DiceRoll();
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(55, 0, 255);
-                Embed.WithDescription(":game_die: " + Game.roll + ". Use ?MoveTowards [coords] to move!");
+                Embed.WithDescription(":game_die: " + Game.roll + ". Use ?Move [coords] to move! Coords take the form of letter then number (i.e. b5 or E18).");
                 await Context.Channel.SendMessageAsync("", false, Embed.Build());
             }           
         }
@@ -83,6 +83,7 @@ namespace ClueBot.Core.Commands
             int die1 = random.Next(1, 7);
             int die2 = random.Next(1, 7);
             return die1 + die2;
+
         }
     } 
 }
