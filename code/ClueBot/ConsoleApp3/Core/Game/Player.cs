@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace ClueBot.Core.Commands
 {
-    public class Player : IComparable<Player> //the player class holds any and all information required from a player
+    public class Player : IComparable<Player>    //the player class holds any and all information required from a player
     {
         public int x, y;
         public string userID;
@@ -36,20 +36,20 @@ namespace ClueBot.Core.Commands
                                                                           //due to the wide open game board
             if (movement > diceroll)
             {
-                Console.WriteLine("\nMovement out of bounds, please try again");
+                
+                Game.movementError = "Movement out of bounds, please try again";
                 return false;
             }
 
-            if (grid.gridID[x, y] > 0 && grid.gridID[x, y] != playerNumber
-                ) //if there is a player and it's not you
+            if (grid.gridID[x, y] > 0 && grid.gridID[x, y] != playerNumber) //if there is a player and it's not you
             {
-                Console.WriteLine("\nCan't move on top of another player, please try again");
+                Game.movementError = "Can't move on top of another player, please try again";
                 return false;
             }
 
             if (grid.blocked[x, y] == true)
             {
-                Console.WriteLine("\nThis space is blocked, please try again");
+                Game.movementError = "This space is blocked, please try again";
                 return false;
             }
 
@@ -60,7 +60,7 @@ namespace ClueBot.Core.Commands
                     if (grid.roomID[x + i, y + j] > 0 //if the space you're trying to move to is next to a door 
                         && (x + i != x || y + j != y)) //if the space you're trying to move to is not the door itself
                     {
-                        Console.WriteLine("\nYou cannot occupy the space in front of a door. Please try again");
+                        //Context.Channel.SendMessageAsync("You cannot occupy the space in front of a door. Please try again");
                         return false;
                         //this is to hopefully stop players blocking eachother from entering doors. hopefully
                     }

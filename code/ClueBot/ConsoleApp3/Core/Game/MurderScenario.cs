@@ -24,7 +24,7 @@ namespace ClueBot.Core.Commands
             {
                 if (player[i] != null)
                 {
-                    personList[i] = player[i].userID;
+                    personList[i] = player[i].username.ToString();
                 }
             }
             CreateMurderScenario();
