@@ -11,7 +11,7 @@ namespace ClueBot.Core.Commands
         public async Task Move(string coords)
         {
             if(Game.gameState.Contains("Move") 
-                && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //Checks if the correct user is using the command
+                /*&& Context.User.Id.ToString() == Game.player[Game.playerTurn].userID*/) //Checks if the correct user is using the command
             {
                 Game.userCoords = coords;
             }
@@ -30,36 +30,37 @@ namespace ClueBot.Core.Commands
             }
         }
 
-        [Command("Suggest"), Alias("Suggestion"), Summary("Suggests [person] with [weapon] in [location].")]
-        public async Task Suggest(IUser user = null, string weapon = null,  string room = null)
+        [Command("Suggest"), Alias("Suggestion"), Summary("Suggests [person] with [weapon].")]
+        public async Task Suggest(string person = null, string weapon = null)
         {
             if (Game.gameState.Contains("Suggest")
-                && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //Checks if the correct user is using the command
+                /*&& Context.User.Id.ToString() == Game.player[Game.playerTurn].userID*/) //Checks if the correct user is using the command
             {
-                Game.suggestionInProgress = true;
+                if(person == null || weapon == null)
+                {
+                    await Context.Channel.SendMessageAsync("You must specify a person and a weapon to suggest (?Suggest [person] [weapon]).");
+                    return;
+                }
                 Game.suggestedWeapon = weapon;
-                Game.suggestedUser = user.Id.ToString();
-                //Game.suggestedRoom = room;    //players can only suggest the room they're in!
+                //Game.suggestedPerson = user.Id.ToString();
+                Game.suggestedPerson = person;
+                Game.suggestionInProgress = true;
 
-                await Context.Channel.SendMessageAsync(Context.User + " suggested that " + user + 
-                    " committed the murder with the " + weapon + " in the " + room + ".");
                 //Context.User.SendMessageAsync
             }
         }
 
         [Command("Accuse"), Alias ("Accusation"), Summary("Accuses [person] with [weapon] in [location].")]
-        public async Task Accuse(IUser user = null, string weapon = null, string room = null)
+        public async Task Accuse(string person = null, string weapon = null, string room = null)
         {
             if (Game.gameState.Contains("Suggest")
-                && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //Checks if the correct user is using the command
+                /*&& Context.User.Id.ToString() == Game.player[Game.playerTurn].userID*/) //Checks if the correct user is using the command
             {
                 Game.suggestionInProgress = true;
                 Game.suggestedWeapon = weapon;
-                Game.suggestedUser = user.Id.ToString();
+                Game.suggestedPerson = person;
+                //Game.suggestedPerson = user.Id.ToString();
                 Game.suggestedRoom = room;
-
-                await Context.Channel.SendMessageAsync(Context.User + " accused " + user +
-                    " of committing the murder with the " + weapon + " in the " + room + ".");
             }
         }
 
@@ -67,7 +68,7 @@ namespace ClueBot.Core.Commands
         public async Task Roll()
         {
             if(Game.gameState.Contains("Roll")
-                && Context.User.Id.ToString() == Game.player[Game.playerTurn].userID) //checks if it is the correct user using the command
+                /*&& Context.User.Id.ToString() == Game.player[Game.playerTurn].userID*/) //checks if it is the correct user using the command
             {
                 Game.roll = DiceRoll();
                 EmbedBuilder Embed = new EmbedBuilder();
@@ -84,6 +85,25 @@ namespace ClueBot.Core.Commands
             int die2 = random.Next(1, 7);
             return die1 + die2;
 
+        }
+
+        [Command("Cards"), Summary("Sends the user their cards.")]
+        public async Task Cards()
+        {
+            foreach (Player playerNum in Game.player)
+            {
+                if (playerNum.username == Context.User)
+                {
+                    string buffer = "";
+
+                    foreach (string card in playerNum.cards)
+                        buffer += card + ", ";
+
+                    buffer = buffer.Remove(buffer.Length - 2);
+                    await Context.User.SendMessageAsync("Your cards: " + buffer + ".");
+                }
+                
+            }
         }
     } 
 }

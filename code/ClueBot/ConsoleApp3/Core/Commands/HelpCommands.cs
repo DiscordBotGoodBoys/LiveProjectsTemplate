@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using System;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 
 namespace ClueBot.Core.Commands
 {

@@ -2,6 +2,7 @@
 using Discord.Commands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace ClueBot.Core.Commands
         public static string userCoords = "";
 
         public static string suggestedWeapon = "";
-        public static string suggestedUser = "";
+        public static string suggestedPerson = "";
         public static string suggestedRoom = "";
         public static bool suggestionInProgress = false;
         public static bool accusationInProgress = false;
@@ -39,23 +40,34 @@ namespace ClueBot.Core.Commands
         [Command("Start"), Alias("StartGame"), Summary("Starts the game.")]
         public async Task StartGame()
         {
-            //Checks if there are enough players in the game.
-            //Note that this will break if player 2 is removed and nobody replaces them.
-            /*if (!PlayerExists(1))
+            if (gamePlaying == true)
+            {
+                return;
+            }
+            currentPlayers = 0;
+            foreach (Player playerNum in player)
+            {
+                if(playerNum != null)
+                    currentPlayers++;
+            }
+            
+            if(currentPlayers < 2)
             {
                 await Context.Channel.SendMessageAsync("There are not enough players to start the game.");
                 return;
             }
-            */
+
 
             //grid.initializeGrid(player);
-            grid.drawGrid(ref gridBuffer);
-            Console.WriteLine(gridBuffer);
+            await PrintGrid();
 
             MurderScenario murderScenario = new MurderScenario(player);
 
             listOfEverything = "";
             SendListToBuffer(ref listOfEverything, murderScenario);
+
+            
+
 
             //DEBUG BLOCK (displays the three murder cards, and then each player's hand
             foreach (string card in murderScenario.murderList)
@@ -69,15 +81,18 @@ namespace ClueBot.Core.Commands
                     foreach (string card in player.cards)
                         Console.Write(card + ", ");
                     Console.Write('\n');
+
+                    
                 }
             }
             //DEBUG BLOCK END
 
-            currentPlayers = 0;
-            foreach(Player player in player)
-            { 
-                currentPlayers++;   //Currently broken; also counts null
+            for (int i = 0; i < currentPlayers; i++)
+            {
+
             }
+
+            
 
             await Context.Channel.SendMessageAsync("The game has begun!");
 
@@ -114,6 +129,7 @@ namespace ClueBot.Core.Commands
                     // the != null check comes into play if there are less than 6 players
                     // gameStatus != -1 checks if the player hasn't lost and can no longer have turns
                     {
+
                         await Turn(player[playerTurn], player, grid, murderScenario);
                         if (gameState == "Won")
                         //runs the current players turn. if they win, return true. if they don't, return false
@@ -122,13 +138,12 @@ namespace ClueBot.Core.Commands
                         }
                         else
                         {
-                            grid.drawGrid(ref gridBuffer);
-                            Console.WriteLine(gridBuffer);
-                            await Context.Channel.SendMessageAsync(gridBuffer);
+                            await PrintGrid();
+                            gameState = "Roll";
                         }
                     }
                     playerTurn++; //cycle to the next player
-                    if (playerTurn >= 6) //if you go out of the array bounds
+                    if (playerTurn >= currentPlayers) //if you go out of the array bounds
                         playerTurn = 0; //the next player cycles back around to 0
                     break;
                 }
@@ -139,7 +154,7 @@ namespace ClueBot.Core.Commands
         public async Task PrintGrid()
         {
             grid.drawGrid(ref gridBuffer);
-            Console.WriteLine(gridBuffer);
+            //Console.WriteLine(gridBuffer);
             await Context.Channel.SendMessageAsync(gridBuffer);
         }
 
@@ -158,8 +173,7 @@ namespace ClueBot.Core.Commands
         {
             if (grid.roomID[player.x, player.y] > 0)
             {
-                await PrintGrid();
-                await Context.Channel.SendMessageAsync("Player " + (playerTurn+1) + "'s turn. You are currently in the " + murderScenario.roomList[grid.roomID[player.x, player.y] - 1] + ". " +
+                await Context.Channel.SendMessageAsync("Player " + (playerTurn+1) + "'s turn. You are currently in the " + murderScenario.roomList[grid.roomID[player.x, player.y]] + ". " +
                     "Make a ?suggestion, ?accuse someone, or ?roll the dice.");
                 gameState = "RollSuggest";
                 
@@ -178,8 +192,11 @@ namespace ClueBot.Core.Commands
                 }
             }
 
-            if (roll == 0) 
+            if (roll == 0)
+            {
                 await Context.Channel.SendMessageAsync("Player " + (playerTurn + 1) + "'s turn. ?Roll the dice!");
+                gameState = "Roll";
+            }
             SpinWait.SpinUntil(() => roll > 0);
 
             gameState = "Move";
@@ -200,13 +217,15 @@ namespace ClueBot.Core.Commands
 
             if (grid.roomID[x, y] > 0)
             {
-                await Context.Channel.SendMessageAsync("You can now ?suggest a case. (?Suggest [@person] [weapon] [location])");
-                SpinWait.SpinUntil(() => suggestionInProgress);
-                if (suggestionInProgress)
+                await Context.Channel.SendMessageAsync("You can now ?suggest a case. (?Suggest [person] [weapon])");
+                gameState = "Suggest";
+                while (!suggestionInProgress)
                 {
+                    SpinWait.SpinUntil(() => suggestionInProgress);
                     await Suggest(player, players, grid.roomID[player.x, player.y], murderScenario);
-                    return /*false*/;
+                    //return /*false*/;
                 }
+                suggestionInProgress = false;
             }
             roll = 0;
             return/* false*/;
@@ -216,21 +235,44 @@ namespace ClueBot.Core.Commands
 
         private async Task Suggest(Player player, Player[] players, int roomID, MurderScenario murderScenario)
         {
-            int weaponChoice = 0;
-            int personChoice = 0;
-            Player nearestPlayerWithCards = CheckPlayersForCards(player.playerNumber, players, murderScenario.personList[personChoice - 1], murderScenario.roomList[roomID - 1], murderScenario.weaponList[weaponChoice - 1]);
+            int personChoice = -1;
+            int weaponChoice = -1;
+            
+            for(int i = 0; i < murderScenario.weaponList.Count; i++)
+            {
+                if (suggestedWeapon == murderScenario.weaponList[i])
+                    weaponChoice = i;
+            }
+
+            for (int i = 0; i < murderScenario.personList.Count; i++)
+            {
+                if (suggestedPerson == murderScenario.personList[i])
+                    personChoice = i;
+            }
+            if(personChoice == -1 || weaponChoice == -1)
+            {
+                await Context.Channel.SendMessageAsync("Invalid suggestion. Check ?list to see which cards are available!");
+                suggestionInProgress = false;
+                return;
+            }
+            
+            await Context.Channel.SendMessageAsync(Context.User + " suggested that " + suggestedPerson +
+                    " committed the murder with the " + suggestedWeapon + " in the " + murderScenario.roomList[roomID] + ".");
+
+            Player nearestPlayerWithCards = CheckPlayersForCards(player.playerNumber, players, murderScenario.personList[personChoice], murderScenario.roomList[roomID], murderScenario.weaponList[weaponChoice]); //removed -1 from all indexes
             if (nearestPlayerWithCards == null)
             {
-                await Context.Channel.SendMessageAsync("The cards you suggested are not held by any of your fellow detectives...");
+                await Context.User.SendMessageAsync("The cards you suggested are not held by any of your fellow detectives...");
+                return;
             }
             else
             {
-                await Context.Channel.SendMessageAsync(nearestPlayerWithCards.userID + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
-                string cardToShow = ChooseCardToShow(nearestPlayerWithCards, player, murderScenario.personList[personChoice - 1], murderScenario.roomList[roomID - 1], murderScenario.weaponList[weaponChoice - 1]);
-                await Context.User.SendMessageAsync(nearestPlayerWithCards.userID + " shows you " + cardToShow + ".");
-                //Must be DM'ed to the player.
-
+                //await Context.Channel.SendMessageAsync(nearestPlayerWithCards.userID + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
+                string cardToShow = ChooseCardToShow(nearestPlayerWithCards, player, murderScenario.personList[personChoice], murderScenario.roomList[roomID], murderScenario.weaponList[weaponChoice]); //removed -1 from all indexes
+                await Context.User.SendMessageAsync(nearestPlayerWithCards.username + " shows you " + cardToShow + ".");
+                return;
             }
+            
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,10 +330,12 @@ namespace ClueBot.Core.Commands
                     noOfCards++;
                 }
             }
+            buffer = buffer.Remove(buffer.Length - 2);
+            return buffer;
+
             if (cards.Count == 1) //if you only have one of the suggested cards, there is no choice to make
             {
                 Console.WriteLine("The only card suggested in your hand was " + buffer + "so you need not choose a card. Press any key to send " + suggestingPlayer.userID + " this card.");
-                Console.ReadKey();
                 return cards[0];
             }
             else
@@ -306,29 +350,29 @@ namespace ClueBot.Core.Commands
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private static Player CheckPlayersForCards(int currentPlayer, Player[] players, string personChoice, string roomChoice, string weaponChoice)
+        private static Player CheckPlayersForCards(int player, Player[] players, string personChoice, string roomChoice, string weaponChoice)
         //this function is akin to asking clockwise around the table if anyone has the cards you suggested
         //the first person clockwise to you who has a card you suggested in their hand is returned in this function
         {
-            int playerID = currentPlayer + 1; //currentPlayer is the person performing the check
-            if (playerID > 6)
-                playerID = 1;
-            while (playerID != currentPlayer)
+            int playerID = player + 1; //player is the person performing the check
+            if (playerID >= currentPlayers)
+                playerID = 0;
+            while (playerID != player)
             {
-                if (playerID > 6)
-                    playerID = 1;//a players ID is always equal to it's index in the main player array plus one. or at least, it should be...
-                if (players[playerID - 1] != null)
+                if (playerID >= currentPlayers)
+                    playerID = 0;
+                if (players[playerID] != null)
                 {
-                    if (players[playerID - 1].cards.Contains(personChoice)
-                        || players[playerID - 1].cards.Contains(roomChoice)
-                        || players[playerID - 1].cards.Contains(weaponChoice))
+                    if (players[playerID].cards.Contains(personChoice)
+                        || players[playerID].cards.Contains(roomChoice)
+                        || players[playerID].cards.Contains(weaponChoice))
                     {
-                        return players[playerID - 1]; //we don't tell the checkee what cards the checked player has in here, just that they have at least one
+                        return players[playerID]; //we don't tell the checkee what cards the checked player has in here, just that they have at least one
                     }
                 }
                 playerID++;
-                if (playerID > 6) //I wrote this check down three times because I'm very paranoid
-                    playerID = 1;
+                if (playerID >= currentPlayers) //I wrote this check down three times because I'm very paranoid
+                    playerID = 0;
             }
             return null;
         }

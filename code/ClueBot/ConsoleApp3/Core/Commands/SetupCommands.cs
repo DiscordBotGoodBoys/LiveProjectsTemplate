@@ -18,7 +18,7 @@ namespace ClueBot.Core.Commands
         {
             if (!Game.gameHosting)  //if game is currently not being hosted
             {
-                Game.player[0] = new Player(Context.User.Id.ToString(), 1, 7, 0); //sets command user to player 1
+                Game.player[0] = new Player(Context.User, Context.User.Id.ToString(), 0, 7, 0); //sets command user to player 1
                 Game.gameHosting = true;
                 await Context.Channel.SendMessageAsync("Game open! Use ?addplayer @[user] to add more players to your game.");
             }
@@ -69,7 +69,7 @@ namespace ClueBot.Core.Commands
                     int[] spawnPointsY = new int[5] {9, 14, 23, 23, 7 };
                     if (!PlayerExists(i))   //fills the lowest available slot with mentioned player.
                     {
-                        Game.player[i] = new Player(User.Id.ToString(), i, spawnPointsX[i], spawnPointsY[i]);
+                        Game.player[i] = new Player(User, User.Id.ToString(), i+1, spawnPointsX[i], spawnPointsY[i]);
                         await Context.Channel.SendMessageAsync("Player " + (i + 1) + " added.");
                         return;
 
@@ -95,6 +95,7 @@ namespace ClueBot.Core.Commands
                     if (Game.player[i].userID == User.Id.ToString())    
                     {
                         Game.player[i] = null;
+                        await Context.Channel.SendMessageAsync("Player " + (i+1) + " successfully removed.");
                     }
                 }
             }

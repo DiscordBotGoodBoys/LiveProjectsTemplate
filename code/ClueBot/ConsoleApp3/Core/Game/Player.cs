@@ -12,23 +12,25 @@ namespace ClueBot.Core.Commands
         public int x, y;
         public string userID;
         public int playerNumber;
+        public IUser username;
 
         public List<string> cards;
         public int gameStatus = 0;
 
-        public Player(string userID, int playerNumber, int x, int y)
+        public Player(IUser username, string userID, int playerNumber, int x, int y)
         {
             this.userID = userID;
             this.playerNumber = playerNumber;
             this.x = x;
             this.y = y;
+            this.username = username;
             cards = new List<string>();
             gameStatus = 0;
         }
 
         public bool MovePlayer(Grid grid, int x, int y, int diceroll) //returns bool to tell gamemanager whether a move occured or not
         {
-            int movement = (Math.Abs(this.x - x) + Math.Abs(this.y - y)); // very simple movement, straight line distance
+            int movement = Math.Abs(this.x - x) + Math.Abs(this.y - y); // very simple movement, straight line distance
                                                                           //could be improved but not enough time and
                                                                           //will very rarely produce incorrect results
                                                                           //due to the wide open game board

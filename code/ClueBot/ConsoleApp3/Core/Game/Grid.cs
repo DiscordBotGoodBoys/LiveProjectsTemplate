@@ -170,12 +170,12 @@ namespace ClueBot.Core.Commands
             gridBuffer += "```\n";
             gridBuffer += "X|";
             for (int i = 0; i <= x; i++)
-                if (i < 10 && i != 0)
-                    gridBuffer += i + " |";
+                if (i < 11 && i > 1)
+                    gridBuffer += i-1 + " |";
                 else if (i != 25)
-                    gridBuffer += i + "|";
+                    gridBuffer += i-1 + "|";
                 else
-                    gridBuffer += i;
+                    gridBuffer += i-1;
             gridBuffer += '\n' + "-|";
 //            for (int i = 0; i < x; i++)
 //                gridBuffer += "---";
@@ -197,7 +197,14 @@ namespace ClueBot.Core.Commands
                     }
                     else
                     {
-                        gridBuffer += gridID[i, j]; //where playerIDs are drawn
+                        if (gridID[i, j] == 0)
+                            gridBuffer += " ";
+
+                        else
+                        {
+                            gridBuffer += gridID[i, j]; //where playerIDs are drawn
+                        }
+                        
                         if (i != x - 1)
                             gridBuffer += " |";
                     }
