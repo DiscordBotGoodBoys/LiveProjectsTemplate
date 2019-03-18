@@ -11,7 +11,7 @@ namespace ClueBot.Core.Commands
         private Random rnd;
 
         public List<string> weaponList = new List<string>() { "Gun", "Bomb", "Scissors", "Knife", "Sword", "Syringe" };
-        public List<string> roomList = new List<string>() { "Bathroom", "Kitchen", "Living Room", "Bedroom", "Shed", "Attic", "Garden", "Study", "Basement" };
+        public List<string> roomList = new List<string>() { "Bathroom", "Kitchen", "LivingRoom", "Bedroom", "Shed", "Attic", "Garden", "Study", "Basement" };
         public List<string> personList = new List<string>() { "Alex", "Sam", "Asad", "Josh", "Hugo", "Cris" };
 
         public List<string> murderList = new List<string>() { };
@@ -24,7 +24,7 @@ namespace ClueBot.Core.Commands
             {
                 if (player[i] != null)
                 {
-                    personList[i] = player[i].username.ToString();
+                    personList[i] = player[i].usernameNoID;
                 }
             }
             CreateMurderScenario();

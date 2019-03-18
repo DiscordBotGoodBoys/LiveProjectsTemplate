@@ -13,6 +13,7 @@ namespace ClueBot.Core.Commands
         public string userID;
         public int playerNumber;
         public IUser username;
+        public string usernameNoID;
 
         public List<string> cards;
         public int gameStatus = 0;
@@ -24,6 +25,7 @@ namespace ClueBot.Core.Commands
             this.x = x;
             this.y = y;
             this.username = username;
+            usernameNoID = username.ToString().Remove(username.ToString().Length-5);
             cards = new List<string>();
             gameStatus = 0;
         }
@@ -60,7 +62,7 @@ namespace ClueBot.Core.Commands
                     if (grid.roomID[x + i, y + j] > 0 //if the space you're trying to move to is next to a door 
                         && (x + i != x || y + j != y)) //if the space you're trying to move to is not the door itself
                     {
-                        //Context.Channel.SendMessageAsync("You cannot occupy the space in front of a door. Please try again");
+                        Game.movementError = "You cannot occupy the space in front of a door. Please try again";
                         return false;
                         //this is to hopefully stop players blocking eachother from entering doors. hopefully
                     }

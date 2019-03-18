@@ -110,9 +110,9 @@ namespace ClueBot.Core.Commands
                 {
                     case 1: //if ended due to a player winning
                         for (int i = 0; i < player.Length; i++)
-                        if (player[i] != null)
-                            if (player[i].gameStatus == 1) //find the winner
-                                winner = player[i].username.ToString();
+                            if (player[i] != null)
+                                if (player[i].gameStatus == 1) //find the winner
+                                    winner = player[i].usernameNoID;
                     await Context.Channel.SendMessageAsync("GAME WON BY " + winner + " VIA ACCUSATION");
                     gameState = "Won";
                     gamePlaying = false;
@@ -120,9 +120,9 @@ namespace ClueBot.Core.Commands
                     break;
                     case -1: //if ended due to all but one players losing
                         for (int i = 0; i < player.Length; i++)
-                        if (player[i] != null)
-                            if (player[i].gameStatus != -1) //the winner is the one that isn't a loser
-                                winner = player[i].username.ToString();
+                            if (player[i] != null)
+                                if (player[i].gameStatus != -1) //the winner is the one that isn't a loser
+                                    winner = player[i].usernameNoID;
                         await Context.Channel.SendMessageAsync("GAME WON BY " + winner + " BY LAST MAN STANDING");
                         gameState = "Won";
                     gamePlaying = false;
@@ -278,7 +278,7 @@ namespace ClueBot.Core.Commands
                 return;
             }
             
-            await Context.Channel.SendMessageAsync(players[playerTurn].username + " suggested that " + suggestedPerson +
+            await Context.Channel.SendMessageAsync(players[playerTurn].usernameNoID + " suggested that " + suggestedPerson +
                     " committed the murder with the " + suggestedWeapon + " in the " + murderScenario.roomList[roomID] + ".");
 
             Player nearestPlayerWithCards = CheckPlayersForCards(player.playerNumber, players, murderScenario.personList[personChoice], murderScenario.roomList[roomID], murderScenario.weaponList[weaponChoice]); //removed -1 from all indexes
@@ -291,7 +291,7 @@ namespace ClueBot.Core.Commands
             {
                 //await Context.Channel.SendMessageAsync(nearestPlayerWithCards.userID + " holds one or more of the cards you suggested. They will now decide which card to reveal.");
                 string cardToShow = ChooseCardToShow(nearestPlayerWithCards, player, murderScenario.personList[personChoice], murderScenario.roomList[roomID], murderScenario.weaponList[weaponChoice]); //removed -1 from all indexes
-                shownCardsBuffer = (nearestPlayerWithCards.username + " shows you " + cardToShow + ".");
+                shownCardsBuffer = (nearestPlayerWithCards.usernameNoID + " shows you " + cardToShow + ".");
                 return;
             }
             
@@ -376,6 +376,7 @@ namespace ClueBot.Core.Commands
                     noOfCards++;
                 }
             }
+
             buffer = buffer.Remove(buffer.Length - 2);
             return buffer;
 
@@ -507,7 +508,7 @@ namespace ClueBot.Core.Commands
             movementError = "";
             suggestionInProgress = false;
             accusationInProgress = false;
-        roll = 0;
+            roll = 0;
         }
 
         public async Task CloseGame()
