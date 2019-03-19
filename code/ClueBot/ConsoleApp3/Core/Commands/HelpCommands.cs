@@ -7,7 +7,7 @@ namespace ClueBot.Core.Commands
     public class HelpCommands : ModuleBase<SocketCommandContext>
     {
         [Command("help"), Summary("Displays commands and what they do.")]
-        public async Task Help(string param)
+        public async Task Help(string param = null)
         {
 
 
